@@ -100,6 +100,8 @@ class ActivityService {
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
+		activity.access_token = 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP'
+
 		try
 		{
 			let response = await http.post( 'activities', body: JSON.stringify( activity ) )

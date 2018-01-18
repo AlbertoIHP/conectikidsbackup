@@ -102,6 +102,8 @@ class ChildrenService {
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
+		children.access_token = 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP'
+
 		try
 		{
 			let response = await http.post( 'childrens', body: JSON.stringify( children ) )

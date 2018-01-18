@@ -102,6 +102,8 @@ class TaskService {
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
+		task.access_token = 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP'
+
 		try
 		{
 			let response = await http.post( 'tasks', body: JSON.stringify( task ) )

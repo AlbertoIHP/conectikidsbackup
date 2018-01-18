@@ -98,6 +98,8 @@ class CourseService {
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
+		course.access_token = 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP'
+
 		try
 		{
 			let response = await http.post( 'courses', body: JSON.stringify( course ) )
