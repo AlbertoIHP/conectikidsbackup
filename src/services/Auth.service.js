@@ -4,7 +4,7 @@ import axios from 'axios'
 class AuthService {
 
 
-	login =  function ( user )
+	login = async function ( user )
 	{
 
 
@@ -17,22 +17,17 @@ class AuthService {
 
 		let headers = {
 			Accept : 'application/json',
-			Content-Type : 'application/json',
+			'Content-Type' : 'application/json',
 			Authorization: 'Basic ' + this.encode( user.email + ':' + user.password) }
 
 
 		let http = axios.create({
 		  baseURL: base.api,
-		  headers: headers
+		  headers: headers,
+
 		})
 
-
-
-
-			return http.post('auth', body: bodyContent)
-
-
-
+		return http.post('auth', bodyContent);
 
 	}
 
@@ -81,4 +76,4 @@ class AuthService {
 }
 
 
-export const authService = new AuthService()
+export default AuthService;

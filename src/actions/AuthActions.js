@@ -10,8 +10,9 @@ import {
   RECOVERY_PASSWORD_FAIL,
   RECOVERY_PASSWORD_SUCCESS
 } from './types';
-import { authServices } from '../services/Auth.service';
+import AuthService from '../services/Auth.service';
 
+const authServices = new AuthService();
 
 export const emailChanged = (text) => {
   return {
@@ -31,8 +32,9 @@ export const loginUser = ({ email, password }) => {
   return (dispatch) => {
     dispatch({ type: LOGIN_USER });
       const user = { email: email, password: password }
-      async authServices.login(user);
-
+      authServices.login(user)
+        .then(response => console.log(response))
+        .catch(error => console.log(error));
   };
 };
 
