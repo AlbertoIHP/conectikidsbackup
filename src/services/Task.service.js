@@ -6,96 +6,56 @@ import axios from 'axios'
 
 class TaskService {
 
-	index = async function ( token )
+	index ( token )
 	{
 
 		let headers = { 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		try
-		{
-			let response = await http.get('tasks')
+
+		return http.get('tasks')
 			
-			console.log(response)	
-			
-			
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+
 	}
 
-	show = async function ( id, token )
+	show ( id, token )
 	{
 		let headers = { 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		try
-		{
-			let response = await http.get('tasks/'+id)
-			
-			console.log(response)
-			
-			
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+
+		return http.get('tasks/'+id)
+
 	}
 
-	update = async function ( id, task, token )
+	update ( id, task, token )
 	{
 
 		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		try
-		{
-			let response = await http.put('tasks/'+id, body: task)
+
+		return http.put('tasks/'+id, task)
 			
-			console.log(response)
-			socket.emit( 'taskUpdated', JSON.stringify( task ) )	
-			
-			
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+
 	}
 
-	destroy = async function ( id, token )
+	destroy ( id, token )
 	{
 		let headers = { 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		try
-		{
-			let response = await http.delete('tasks/'+id)
+		return http.delete('tasks/'+id)
 			
-			console.log(response)
-			socket.emit( 'taskDeleted', JSON.stringify( task ) )	
-			
-			
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+
 	}
 
 
-	store = async function ( task )
+	store ( task )
 	{
 
 		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json' }
@@ -104,24 +64,14 @@ class TaskService {
 
 		task.access_token = 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP'
 
-		try
-		{
-			let response = await http.post( 'tasks', body: JSON.stringify( task ) )
+
+		return http.post( 'tasks', JSON.stringify( task ) )
 			
-			console.log(response)
-			socket.emit( 'taskAdded', JSON.stringify( task ) )	
-			
-			
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+
 
 	}
 
 }
 
 
-export const taskService = new TaskService()
+export default TaskService

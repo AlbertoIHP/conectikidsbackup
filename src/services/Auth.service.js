@@ -4,7 +4,7 @@ import axios from 'axios'
 class AuthService {
 
 
-	login = async function ( user )
+	login ( user )
 	{
 
 
@@ -16,9 +16,9 @@ class AuthService {
 
 
 		let headers = {
-			Accept : 'application/json',
+			'Accept' : 'application/json',
 			'Content-Type' : 'application/json',
-			Authorization: 'Basic ' + this.encode( user.email + ':' + user.password) }
+			'Authorization': 'Basic ' + this.encode( user.email + ':' + user.password) }
 
 
 		let http = axios.create({
@@ -31,7 +31,7 @@ class AuthService {
 
 	}
 
-	encode = function( input )
+	encode ( input )
 	{
 	   var keyStr: any = 'ABCDEFGHIJKLMNOP' +
 	        'QRSTUVWXYZabcdef' +

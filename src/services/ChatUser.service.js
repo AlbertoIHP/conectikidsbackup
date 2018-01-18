@@ -6,94 +6,56 @@ import axios from 'axios'
 
 class ChatUserService {
 
-	index = async function ( token )
+	index ( token )
 	{
 
 		let headers = { 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		try
-		{
-			let response = await http.get('chatsusers')
+		return http.get('chatsusers')
 			
-			console.log( response )
-			
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+
 	}
 
-	show = async function ( id, token )
+	show ( id, token )
 	{
 		let headers = { 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		try
-		{
-			let response = await http.get('chatsusers/'+id)
+		return http.get('chatsusers/'+id)
 			
-			console.log( response )
-			
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+
 	}
 
-	update = async function ( id, chatuser, token )
+	update ( id, chatuser, token )
 	{
 
 		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		try
-		{
-			let response = await http.put('chatsusers/'+id, body: chatuser)
+
+		return http.put('chatsusers/'+id, chatuser)
 			
-			console.log( response )
-			socket.emit( 'chatUserUpdated', JSON.stringify( chatuser ) )	
-			
-			
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+
 	}
 
-	destroy = async function ( id, token )
+	destroy ( id, token )
 	{
 		let headers = { 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		try
-		{
-			let response = await http.delete('chatsusers/'+id)
+
+		return http.delete('chatsusers/'+id)
 			
-			console.log( response )
-			socket.emit( 'chatUserDeleted', JSON.stringify( chatuser ) )	
-			
-			
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+
 	}
 
 
-	store = async function ( chatuser )
+	store ( chatuser )
 	{
 
 		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json' }
@@ -102,24 +64,14 @@ class ChatUserService {
 
 		chatuser.access_token = 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP'
 
-		try
-		{
-			let response = await http.post( 'chatsusers', body: JSON.stringify( chatuser ) )
+
+		return http.post( 'chatsusers', JSON.stringify( chatuser ) )
 			
-			console.log( response )
-			socket.emit( 'chatUserAdded', JSON.stringify( chatuser ) )	
-			
-			
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+
 
 	}
 
 }
 
 
-export const chatUserService = new ChatUserService()
+export default ChatUserService
