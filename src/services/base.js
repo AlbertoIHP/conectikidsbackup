@@ -1,3 +1,4 @@
 export const base = {
-	api: 'https://wasapi.herokuapp.com'
+	api: 'https://conectikidsback.herokuapp.com/api/',
+	base: 'https://conectikidsback.herokuapp.com/'
 }

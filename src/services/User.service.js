@@ -96,6 +96,7 @@ class UserService {
 	{
 		user.email = user.email.toLowerCase()
 		user.password = user.password.toLowerCase()
+		user.access_token = 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP'
 
 		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json' }
 

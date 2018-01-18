@@ -100,6 +100,8 @@ class ChatUserService {
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
+		chatuser.access_token = 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP'
+
 		try
 		{
 			let response = await http.post( 'chatsusers', body: JSON.stringify( chatuser ) )
