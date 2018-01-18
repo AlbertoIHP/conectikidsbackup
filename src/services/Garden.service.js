@@ -5,95 +5,56 @@ import axios from 'axios'
 
 class GardenService {
 
-	index = async function ( token )
+	index ( token )
 	{
 
 		let headers = { 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		try
-		{
-			let response = await http.get('gardens')
+		return http.get('gardens')
 			
-			console.log( response )			
-			
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+
 	}
 
-	show = async function ( id, token )
+	show ( id, token )
 	{
 		let headers = { 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		try
-		{
-			let response = await http.get('gardens/'+id)
-			
-			console.log( response )	
-			
-			
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+
+		return http.get('gardens/'+id)
+
 	}
 
-	update = async function ( id, garden, token )
+	update ( id, garden, token )
 	{
 
 		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		try
-		{
-			let response = await http.put('gardens/'+id, body: garden)
+
+		return http.put('gardens/'+id, garden)
 			
-			console.log( response )
-			socket.emit( 'gardenUpdated', JSON.stringify( garden ) )	
-			
-			
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+
 	}
 
-	destroy = async function ( id, token )
+	destroy ( id, token )
 	{
 		let headers = { 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		try
-		{
-			let response = await http.delete('gardens/'+id)
+
+		return http.delete('gardens/'+id)
 			
-			console.log( response )
-			socket.emit( 'gardenDeleted', JSON.stringify( garden ) )	
-			
-			
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+
 	}
 
 
-	store = async function ( garden )
+	store ( garden )
 	{
 
 		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json' }
@@ -102,24 +63,13 @@ class GardenService {
 
 		garden.access_token = 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP'
 
-		try
-		{
-			let response = await http.post( 'gardens', body: JSON.stringify( garden ) )
+		return http.post( 'gardens',  JSON.stringify( garden ) )
 			
-			console.log( response )
-			socket.emit( 'gardenAdded', JSON.stringify( garden ) )	
-			
-			
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+
 
 	}
 
 }
 
 
-export const gardenService = new GardenService()
+export default GardenService

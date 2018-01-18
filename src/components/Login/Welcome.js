@@ -1,12 +1,23 @@
 /* @flow */
 
 import React, { Component } from 'react';
-// import { Actions } from 'react-native-router-flux';
-import { Container, Content, Header, Card, CardItem, Body, Item, Icon, Label, Input, Form } from 'native-base';
-import { Image, StyleSheet, Text, View, TextInput} from 'react-native';
-import { Col, Row, Grid } from "react-native-easy-grid";
+import {
+Container,
+Content,
+Card,
+Body,
+Item,
+Icon,
+Label,
+Input,
+Form,
+Spinner
+} from 'native-base';
+import { Row, Grid } from 'react-native-easy-grid';
+import { Image, StyleSheet, Text, TouchableOpacity, Platform } from 'react-native';
+import { LinearGradient } from 'expo';
 import { connect } from 'react-redux';
-
+import { Actions } from 'react-native-router-flux';
 import { emailChanged, passwordChanged, loginUser } from '../../actions';
 
 class Welcome extends Component {
@@ -23,37 +34,27 @@ class Welcome extends Component {
     this.props.loginUser({ email, password });
   }
 
+  onTextPress1() {
+    Actions.ForgotPassword();
+  }
+
   renderButton() {
       if (this.props.loading) {
-        return <Spinner color='#FF9800' />;
+        return <Spinner color='#fd6342' />;
       }
-
       return (
-        <Button block rounded
-          onPress={this.onButtonPress.bind(this)}
-          style={{
-            marginTop: 20,
-            marginLeft: 20,
-            marginRight: 20,
-            marginBottom: 5,
-            backgroundColor: '#FF9800'
-          }}
-        >
-          <Text
-            style={{
-              color: 'white',
-              fontWeight: 'bold'
-            }}
-          >Iniciar Sesión</Text>
-        </Button>
-      );
-  }
 
-  onTextPress() {
-    Actions.CreateAccount();
-  }
-  onTextPress1() {
-    Actions.RecoveryAccount();
+        <TouchableOpacity style={styles.touchable} onPress={() => this.onButtonPress()}>
+          <LinearGradient
+            colors={['#fd7292', '#fd6342']}
+            style={styles.gradient}
+          >
+            <Text
+              style={styles.buttonText}
+            >Iniciar Sesión</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+    );
   }
 
   render() {
@@ -64,11 +65,11 @@ class Welcome extends Component {
         style={styles.imageBackground}
         />
         <Content
-          disableKBDismissScroll={true}
           contentContainerStyle={styles.contentStyle}
+          disableKBDismissScroll
         >
           <Grid>
-            <Row size={10}></Row>
+            <Row size={10} />
             <Row size={15}>
               <Image
               source={require('./img/logoname.png')}
@@ -76,14 +77,44 @@ class Welcome extends Component {
               style={styles.imageLogo}
               />
             </Row>
-            <Row size={85}>
-              <Image
-                source={require('./img/form_login2.png')}
-                style={{ height: 400, position: 'absolute'}}
-                resizeMode='contain'
-              />
-              <TextInput placeholder="jasdfjlkajdfsl"/>
+            <Row size={70}>
+              <Card style={{ marginLeft: 10, marginRight: 10 }}>
+                <Form>
+                  <Item floatingLabel>
+                    <Label>
+                      <Icon name='mail' style={{ fontSize: 20, color: 'grey', marginRight: 50 }} />
+                         test@gmail.com
+                    </Label>
+                    <Input
+                      onChangeText={this.onEmailChange.bind(this)}
+                      value={this.props.email}
+                    />
+                  </Item>
+                  <Item floatingLabel last>
+                    <Label>
+                      <Icon name='lock' style={{ fontSize: 20, color: 'grey', marginRight: 50 }} />
+                      Contraseña
+                    </Label>
+                    <Input
+                      secureTextEntry
+                      onChangeText={this.onPasswordChange.bind(this)}
+                      value={this.props.password}
+                    />
+                  </Item>
+                </Form>
+                {this.renderButton()}
+                <Body>
+                  <Text style={styles.errorTextStyle}>
+                    {this.props.error}
+                  </Text>
+                  <Text
+                    style={{ fontSize: 15, textDecorationLine: 'underline', marginTop: 20 }}
+                    onPress={this.onTextPress1}
+                  >¿ Has olvidado tu contraseña ?</Text>
+                </Body>
+              </Card>
             </Row>
+            <Row size={15} />
           </Grid>
         </Content>
       </Container>
@@ -96,14 +127,45 @@ const styles = StyleSheet.create({
     position: 'absolute'
   },
   imageLogo: {
-    flex:1,
+    flex: 1,
     height: 100,
-    width: 100,
-
+    width: 100
   },
   contentStyle: {
     flex: 1,
     justifyContent: 'center'
+  },
+  touchable: {
+    marginTop: 20,
+    marginLeft: 20,
+    marginRight: 20,
+    marginBottom: 5,
+    height: 50
+  },
+  gradient: {
+    flex: 1,
+    padding: 5,
+    borderRadius: 5,
+    ...Platform.select({
+      ios: { zIndex: 2 },
+      android: { elevation: 2 }
+    }),
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    fontSize: 20
+  },
+  errorTextStyle: {
+    fontSize: 15,
+    alignSelf: 'center',
+    color: 'red'
   }
 });
 

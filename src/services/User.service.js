@@ -6,48 +6,30 @@ import axios from 'axios'
 
 class UserService {
 
-	index = async function ( token )
+	index ( token )
 	{
 
 		let headers = { 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		try
-		{
-			let response = await http.get('users')
-			
-			console.log( response )
 
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+		return http.get('users')
+
 	}
 
-	show = async function ( id, token )
+	show ( id, token )
 	{
 		let headers = { 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		try
-		{
-			let response = await http.get('users/'+id)
-			
-			console.log(response)
 
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+		return http.get('users/'+id)
+
 	}
 
-	update = async function ( id, user, token )
+	update ( id, user, token )
 	{
 		user.password = user.password.toLowerCase()
 
@@ -55,44 +37,26 @@ class UserService {
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		try
-		{
-			let response = await http.put('users/'+id, body: user)
 
-			console.log(response)
-			socket.emit( 'userUpdated', JSON.stringify( user ) )	
-			
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+		return http.put('users/'+id, user)
+
+
 	}
 
-	destroy = async function ( id, token )
+	destroy ( id, token )
 	{
 		let headers = { 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		try
-		{
-			let response = await http.delete('users/'+id)
-			
-			console.log(response)
-			socket.emit( 'userDeleted', JSON.stringify( user ) )	
 
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+		return http.delete('users/'+id)
+			
+
 	}
 
 
-	store = async function ( user )
+	store ( user )
 	{
 		user.email = user.email.toLowerCase()
 		user.password = user.password.toLowerCase()
@@ -102,23 +66,14 @@ class UserService {
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		try
-		{
-			let response = await http.post( 'users', body: JSON.stringify( user ) )
+
+		return http.post( 'users', JSON.stringify( user ) )
 			
-			console.log(response)
-			socket.emit( 'userAdded', JSON.stringify( user ) )	
-						
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+
 
 	}
 
 }
 
 
-export const userService = new UserService()
+export default UserService
