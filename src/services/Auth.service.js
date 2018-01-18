@@ -4,7 +4,7 @@ import axios from 'axios'
 class AuthService {
 
 
-	login = async function ( user )
+	login =  function ( user )
 	{
 
 
@@ -15,28 +15,24 @@ class AuthService {
 		bodyContent = JSON.stringify({ access_token: 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP' })
 
 
-		let headers = { 
-			Accept : 'application/json', 
-			Content-Type : 'application/json', 
+		let headers = {
+			Accept : 'application/json',
+			Content-Type : 'application/json',
 			Authorization: 'Basic ' + this.encode( user.email + ':' + user.password) }
-		
 
-		let http = axios.create({	
+
+		let http = axios.create({
 		  baseURL: base.api,
 		  headers: headers
 		})
 
 
-		try
-		{
-			let response = await http.post('auth', body: bodyContent)
-			
-			return response.json()
-		}
-		catch ( error )
-		{
-			return 401
-		}
+
+
+			return http.post('auth', body: bodyContent)
+
+
+
 
 	}
 

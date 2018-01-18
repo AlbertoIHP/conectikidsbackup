@@ -44,7 +44,7 @@ class Welcome extends Component {
       }
       return (
 
-        <TouchableOpacity style={styles.touchable} onPress={() => this.onButtonPress() }>
+        <TouchableOpacity style={styles.touchable} onPress={() => this.onButtonPress()}>
           <LinearGradient
             colors={['#fd7292', '#fd6342']}
             style={styles.gradient}
