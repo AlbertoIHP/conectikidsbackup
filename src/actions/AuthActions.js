@@ -1,3 +1,4 @@
+import { AsyncStorage } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import {
   EMAIL_CHANGED,
@@ -34,7 +35,15 @@ export const loginUser = ({ email, password }) => {
     dispatch({ type: LOGIN_USER });
       const user = { email, password };
       authServices.login(user)
-        .then((response) => loginUserSuccess(dispatch, user))
+        .then(
+          (response) => {
+            saveItem('authToken', response.data.token)
+            .then(resp => {
+              saveItem('refreshToken', response.data.token);
+            });
+            saveItem('userObject', JSON.stringify(response.data.user));
+            loginUserSuccess(dispatch);
+          })
         .catch((error) => loginUserFail(dispatch));
   };
 };
@@ -43,10 +52,9 @@ const loginUserFail = (dispatch) => {
     dispatch({ type: LOGIN_USER_FAIL });
 };
 
-const loginUserSuccess = (dispatch, user) => {
+const loginUserSuccess = (dispatch) => {
   dispatch({
-    type: LOGIN_USER_SUCCESS,
-    payload: user
+    type: LOGIN_USER_SUCCESS
   });
   Actions.Home();
 };
@@ -65,4 +73,12 @@ const recoveryUserSuccess = (dispatch) => {
 };
 const recoveryUserFail = (dispatch) => {
   dispatch({ type: RECOVERY_PASSWORD_FAIL });
+};
+
+const saveItem = async (item, selectedValue) => {
+  try {
+    await AsyncStorage.setItem(item, selectedValue);
+  } catch (error) {
+    throw error;
+  }
 };
