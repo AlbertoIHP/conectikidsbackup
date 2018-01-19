@@ -59,10 +59,12 @@ class Welcome extends Component {
 
   render() {
     return (
-      <Container>
+      <Container style={{ flex: 1 }}>
         <Image
         source={require('./img/BackgroundLogin.png')}
+        resizeMode='cover'
         style={styles.imageBackground}
+
         />
         <Content
           contentContainerStyle={styles.contentStyle}
@@ -124,7 +126,8 @@ class Welcome extends Component {
 const styles = StyleSheet.create({
   imageBackground: {
     flex: 1,
-    position: 'absolute'
+    position: 'absolute',
+    height: "100%"
   },
   imageLogo: {
     flex: 1,

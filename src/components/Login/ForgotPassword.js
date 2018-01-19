@@ -116,7 +116,8 @@ class ForgotPassword extends Component {
 const styles = StyleSheet.create({
   imageBackground: {
     flex: 1,
-    position: 'absolute'
+    position: 'absolute',
+    height: '100%'
   },
   touchable: {
     marginTop: 20,
