@@ -26,6 +26,18 @@ import {
 
 import { LinearGradient } from 'expo';
 
+
+import AgendaHome  from '../AgendaHome'
+
+import FeedHome from '../FeedHome'
+
+import ProfileHome from '../ProfileHome'
+
+import ChatHome from '../ChatHome'
+
+
+
+
 export default class MainContainer extends Component {
 
   constructor(props)
@@ -100,7 +112,13 @@ export default class MainContainer extends Component {
 
 
         <Content>
-          <Text> Hola </Text>
+          { this.state.homeActive ? <FeedHome /> : null }
+
+          { this.state.chatActive ? <ChatHome /> : null }
+
+          { this.state.profileActive ? <ProfileHome />: null }
+
+          { this.state.agendaActive ? <AgendaHome />: null }
         </Content>
 
         <Footer style={{ backgroundColor: 'white' }}>

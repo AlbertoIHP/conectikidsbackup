@@ -10,8 +10,8 @@ import {
 } from '../actions/types';
 
 const INTITIAL_STATE = {
-   email: '',
-   password: '',
+   email: 'a.herrera07@ufromail.cl',
+   password: 'alberto123',
    user: null,
    error: '',
    loading: false,
