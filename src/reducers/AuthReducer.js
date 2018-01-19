@@ -15,6 +15,7 @@ const INTITIAL_STATE = {
    user: null,
    error: '',
    loading: false,
+   error2: ''
  };
 
 export default (state = INTITIAL_STATE, action) => {
@@ -30,11 +31,11 @@ export default (state = INTITIAL_STATE, action) => {
     case LOGIN_USER_FAIL:
       return { ...state, error: 'Password incorrecta.', password: '', loading: false };
     case RECOVERY_PASSWORD:
-      return { ...state, loading: true, error: '' };
+      return { ...state, loading: true, error2: '' };
     case RECOVERY_PASSWORD_SUCCESS:
-      return { ...state, ...INTITIAL_STATE, user: action.payload };
+      return { ...state, error2: 'Se te ha enviado un mail.' };
     case RECOVERY_PASSWORD_FAIL:
-      return { ...state, error: 'Email inválido.', email: '', loading: false };
+      return { ...state, error2: 'Email inválido.', email: '', loading: false };
     default:
       return state;
 

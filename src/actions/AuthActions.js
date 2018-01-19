@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { Actions } from 'react-native-router-flux';
 import {
   EMAIL_CHANGED,
@@ -11,8 +10,10 @@ import {
   RECOVERY_PASSWORD_SUCCESS
 } from './types';
 import AuthService from '../services/Auth.service';
+import ForgotPasswordService from '../services/ForgotPassword.service';
 
 const authServices = new AuthService();
+const forgotPasswordServices = new ForgotPasswordService();
 
 export const emailChanged = (text) => {
   return {
@@ -31,10 +32,10 @@ export const passwordChanged = (text) => {
 export const loginUser = ({ email, password }) => {
   return (dispatch) => {
     dispatch({ type: LOGIN_USER });
-      const user = { email: email, password: password }
+      const user = { email, password };
       authServices.login(user)
-        .then(response => console.log(response))
-        .catch(error => console.log(error));
+        .then((response) => loginUserSuccess(dispatch, user))
+        .catch((error) => loginUserFail(dispatch));
   };
 };
 
@@ -47,18 +48,21 @@ const loginUserSuccess = (dispatch, user) => {
     type: LOGIN_USER_SUCCESS,
     payload: user
   });
-  Actions.Map();
+  Actions.Home();
 };
 
 export const recoveryUser = ({ email }) => {
   return (dispatch) => {
     dispatch({ type: RECOVERY_PASSWORD });
+      forgotPasswordServices.sendMail(email)
+        .then((response) => recoveryUserSuccess(dispatch))
+        .catch((error) => recoveryUserFail(dispatch));
   };
 };
 
 const recoveryUserSuccess = (dispatch) => {
-  dispatch({ type: RECOVERY_PASSWORD_FAIL });
+  dispatch({ type: RECOVERY_PASSWORD_SUCCESS });
 };
 const recoveryUserFail = (dispatch) => {
-  dispatch({ type: RECOVERY_PASSWORD_SUCCESS });
+  dispatch({ type: RECOVERY_PASSWORD_FAIL });
 };

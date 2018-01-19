@@ -47,7 +47,7 @@ class ForgotPassword extends Component {
       }
 
       return (
-        <TouchableOpacity style={styles.touchable} onPress={this.onButtonPressRecovery}>
+        <TouchableOpacity style={styles.touchable} onPress={() => this.onButtonPressRecovery()}>
           <LinearGradient
             colors={['#fd7292', '#fd6342']}
             style={styles.gradientButton}
@@ -103,7 +103,7 @@ class ForgotPassword extends Component {
             { this.renderButton() }
             <Body>
               <Text style={styles.errorTextStyle}>
-                {this.props.error}
+                {this.props.error2}
               </Text>
             </Body>
           </Card>
@@ -116,7 +116,8 @@ class ForgotPassword extends Component {
 const styles = StyleSheet.create({
   imageBackground: {
     flex: 1,
-    position: 'absolute'
+    position: 'absolute',
+    height: '100%'
   },
   touchable: {
     marginTop: 20,
@@ -153,16 +154,17 @@ const styles = StyleSheet.create({
   errorTextStyle: {
     fontSize: 15,
     alignSelf: 'center',
-    color: 'red'
+    color: 'red',
+    marginBottom: 10
   }
 });
 
 const mapStateToPros = ({ auth }) => {
-  const { email, password, error, loading } = auth;
+  const { email, password, error2, loading } = auth;
     return {
       email,
       password,
-      error,
+      error2,
       loading
     };
 };
