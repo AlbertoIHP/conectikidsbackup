@@ -188,6 +188,17 @@ export default class MainContainer extends Component {
     this.drawer._root.open()
   }
 
+  _renderAddTaskButon()
+  {
+    return (
+      <Right>
+        <Button transparent onPress={() => this.openDrawer() }>
+          <Icon style= {{ color: "white" }} name="ios-add-outline" />
+        </Button>
+      </Right>
+      )
+  }
+
 
   render() {
 
@@ -199,17 +210,11 @@ export default class MainContainer extends Component {
         onClose={() => this.closeDrawer()} >
 
         <Container style={styles.container}>
-            <LinearGradient
-              colors={['#fd7292', '#fd6342']}
-              style={styles.gradientHeader}
-            >
+            <LinearGradient colors={['#fd7292', '#fd6342']} style={styles.gradientHeader} >
               <Header style={{ backgroundColor: 'transparent' }}>
 
                 <Left>
-                  <Button
-                    transparent
-                    onPress={() => this.openDrawer() }
-                  >
+                  <Button transparent onPress={() => this.openDrawer() } >
                     <Icon style= {{ color: "white" }} name="menu" />
                   </Button>
                 </Left>
@@ -218,7 +223,8 @@ export default class MainContainer extends Component {
                   <Title style={{ color: 'white' }}>Inicio</Title>
                 </Body>
 
-                <Right />
+
+                { this.state.agendaActive ? this._renderAddTaskButon() : <Right /> }                
 
               </Header>
             </LinearGradient>

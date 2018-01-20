@@ -22,23 +22,28 @@ import { emailChanged, passwordChanged, loginUser } from '../../actions';
 
 class Welcome extends Component {
 
-  onEmailChange(text) {
+  onEmailChange(text) 
+  {
     this.props.emailChanged(text);
   }
-  onPasswordChange(text) {
+  onPasswordChange(text) 
+  {
     this.props.passwordChanged(text);
   }
 
-  onButtonPress() {
+  onButtonPress() 
+  {
     const { email, password } = this.props;
     this.props.loginUser({ email, password });
   }
 
-  onTextPress1() {
+  onTextPress1() 
+  {
     Actions.ForgotPassword();
   }
 
-  renderButton() {
+  renderButton() 
+  {
       if (this.props.loading) {
         return <Spinner color='#fd6342' />;
       }
@@ -57,28 +62,19 @@ class Welcome extends Component {
     );
   }
 
-  render() {
+  render() 
+  {
     return (
       <Container style={{ flex: 1 }}>
-        <Image
-        source={require('./img/BackgroundLogin.png')}
-        resizeMode='cover'
-        style={styles.imageBackground}
-
-        />
-        <Content
-          contentContainerStyle={styles.contentStyle}
-          disableKBDismissScroll
-        >
+        <Image source={require('./img/BackgroundLogin.png')} resizeMode='cover' style={styles.imageBackground} />
+        
+        <Content contentContainerStyle={styles.contentStyle} disableKBDismissScroll >
           <Grid>
             <Row size={10} />
             <Row size={15}>
-              <Image
-              source={require('./img/logoname.png')}
-              resizeMode='contain'
-              style={styles.imageLogo}
-              />
+              <Image source={require('./img/logoname.png')} resizeMode='contain' style={styles.imageLogo} />
             </Row>
+
             <Row size={70}>
               <Card style={{ marginLeft: 10, marginRight: 10 }}>
                 <Form>
@@ -116,6 +112,7 @@ class Welcome extends Component {
                 </Body>
               </Card>
             </Row>
+            
             <Row size={15} />
           </Grid>
         </Content>
