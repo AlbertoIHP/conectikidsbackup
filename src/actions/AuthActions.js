@@ -56,7 +56,7 @@ const loginUserSuccess = (dispatch) => {
   dispatch({
     type: LOGIN_USER_SUCCESS
   });
-  Actions.MainContainer();
+  Actions.MainContainer({ type: 'reset' });
 };
 
 export const recoveryUser = ({ email }) => {
