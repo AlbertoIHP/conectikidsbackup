@@ -231,7 +231,16 @@ export default class MainContainer extends Component {
                 </Left>
 
                 <Body>
-                  <Title style={{ color: 'white' }}>Inicio</Title>
+                  { this.state.homeActive ? <Title style={{ color: 'white' }}>Inicio</Title> : null }
+
+                  { this.state.chatActive ? <Title style={{ color: 'white' }}>Chats</Title> : null }
+
+                  { this.state.profileActive ? <Title style={{ color: 'white' }}>Perfil</Title>: null }
+
+                  { this.state.agendaActive ? <Title style={{ color: 'white' }}>Agenda</Title>: null }
+
+                  { this.state.menuActive ? <Title style={{ color: 'white' }}>Menu</Title>: null }
+                  
                 </Body>
 
 

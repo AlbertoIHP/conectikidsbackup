@@ -21,9 +21,10 @@ const rows = [
   {id: 8, text: 'Notas', icon: require('./img/obs.png'), color: '#66BB6A'},
 ]
 
-const extractKey = ({id}) => id;
-const dim = Dimensions.get('window');
-const itemWidth = dim.width / 4;
+const extractKey = ({id}) => id
+const dim = Dimensions.get('window')
+const itemWidth = dim.width / 4
+import { Grid, Row } from 'native-base'
 
 
 class Menu extends Component {
@@ -37,28 +38,7 @@ class Menu extends Component {
     Actions.AddActivity({ text: text })
   }
 
-  renderItem ( {item} ) 
-  {
-    return (
-      <View style={[styles.row, styles.containerText]}>
-        <TouchableOpacity key={item.id} onPress={() => this._onPressButton(item.text)}>
 
-        <Image
-          source={item.icon}
-          style={{ width: 55 , height: 55}}
-
-
-        />
-
-        </TouchableOpacity>
-        <Text style={{
-          marginTop: 5,
-          textAlign: 'center',
-          color: item.color
-        }}>{item.text}</Text>
-      </View>
-    )
-  }
 
 
 
@@ -66,12 +46,107 @@ class Menu extends Component {
   render() 
   {
     return (
-      <FlatList
-        contentContainerStyle={ styles.container }
-        data={rows}
-        renderItem={ ( item ) => this.renderItem( item )}
-        keyExtractor={extractKey}
-      />
+      <Grid>
+        <Row>
+          <View style={[styles.row, styles.containerText]}>
+            <TouchableOpacity key={rows[0].id} onPress={() => this._onPressButton(rows[0].text)}>
+             <Image source={rows[0].icon} style={{ width: 55 , height: 55}} />
+            </TouchableOpacity>
+
+            <Text style={{ marginTop: 5,  textAlign: 'center',  color: rows[0].color}}>
+              {rows[0].text}
+            </Text>
+          </View>
+
+          <View style={[styles.row, styles.containerText]}>
+            <TouchableOpacity key={rows[1].id} onPress={() => this._onPressButton(rows[1].text)}>
+             <Image source={rows[1].icon} style={{ width: 55 , height: 55}} />
+            </TouchableOpacity>
+
+            <Text style={{ marginTop: 5,  textAlign: 'center',  color: rows[1].color}}>
+              {rows[1].text}
+            </Text>
+          </View>
+
+          <View style={[styles.row, styles.containerText]}>
+            <TouchableOpacity key={rows[2].id} onPress={() => this._onPressButton(rows[2].text)}>
+             <Image source={rows[2].icon} style={{ width: 55 , height: 55}} />
+            </TouchableOpacity>
+
+            <Text style={{ marginTop: 5,  textAlign: 'center',  color: rows[2].color}}>
+              {rows[2].text}
+            </Text>
+          </View>
+
+        </Row>
+
+        <Row>
+          <View style={[styles.row, styles.containerText]}>
+            <TouchableOpacity key={rows[3].id} onPress={() => this._onPressButton(rows[3].text)}>
+             <Image source={rows[3].icon} style={{ width: 55 , height: 55}} />
+            </TouchableOpacity>
+
+            <Text style={{ marginTop: 5,  textAlign: 'center',  color: rows[3].color}}>
+              {rows[3].text}
+            </Text>
+          </View>
+
+          <View style={[styles.row, styles.containerText]}>
+            <TouchableOpacity key={rows[4].id} onPress={() => this._onPressButton(rows[4].text)}>
+             <Image source={rows[4].icon} style={{ width: 55 , height: 55}} />
+            </TouchableOpacity>
+
+            <Text style={{ marginTop: 5,  textAlign: 'center',  color: rows[4].color}}>
+              {rows[4].text}
+            </Text>
+          </View>
+
+          <View style={[styles.row, styles.containerText]}>
+            <TouchableOpacity key={rows[5].id} onPress={() => this._onPressButton(rows[5].text)}>
+             <Image source={rows[5].icon} style={{ width: 55 , height: 55}} />
+            </TouchableOpacity>
+
+            <Text style={{ marginTop: 5,  textAlign: 'center',  color: rows[5].color}}>
+              {rows[5].text}
+            </Text>
+          </View>
+
+        </Row>
+
+        <Row>
+          <View style={[styles.row, styles.containerText]}>
+            <TouchableOpacity key={rows[6].id} onPress={() => this._onPressButton(rows[6].text)}>
+             <Image source={rows[6].icon} style={{ width: 55 , height: 55}} />
+            </TouchableOpacity>
+
+            <Text style={{ marginTop: 5,  textAlign: 'center',  color: rows[6].color}}>
+              {rows[6].text}
+            </Text>
+          </View>
+
+          <View style={[styles.row, styles.containerText]}>
+            <TouchableOpacity key={rows[7].id} onPress={() => this._onPressButton(rows[7].text)}>
+             <Image source={rows[7].icon} style={{ width: 55 , height: 55}} />
+            </TouchableOpacity>
+
+            <Text style={{ marginTop: 5,  textAlign: 'center',  color: rows[7].color}}>
+              {rows[7].text}
+            </Text>
+          </View>
+
+          <View style={[styles.row, styles.containerText]}>
+            <TouchableOpacity key={rows[8].id} onPress={() => this._onPressButton(rows[8].text)}>
+             <Image source={rows[8].icon} style={{ width: 55 , height: 55}} />
+            </TouchableOpacity>
+
+            <Text style={{ marginTop: 5,  textAlign: 'center',  color: rows[8].color}}>
+              {rows[8].text}
+            </Text>
+          </View>
+
+        </Row>
+
+      </Grid>
     )
   }
 }
@@ -81,7 +156,7 @@ class Menu extends Component {
 const styles = StyleSheet.create({
   containerText:
   {
-    flex: 1,
+    flex: 2,
     justifyContent: 'center',
     alignItems: 'center',
 
@@ -95,7 +170,7 @@ const styles = StyleSheet.create({
   },
   row: 
   {
-    padding: 15,
+    padding: 10,
     margin: 14,
     width: itemWidth,
     height: 110,
