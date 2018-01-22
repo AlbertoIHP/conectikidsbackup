@@ -9,5 +9,4 @@ export const RECOVERY_PASSWORD = 'recovery_password';
 export const RECOVERY_PASSWORD_SUCCESS = 'recovery_password_success';
 export const RECOVERY_PASSWORD_FAIL = 'recovery_password_fail';
 
-// MAPS CONST
-export const REGION_CHANGED = 'region_changed';
+//HOME CONST
