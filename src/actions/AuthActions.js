@@ -56,7 +56,11 @@ const loginUserSuccess = (dispatch) => {
   dispatch({
     type: LOGIN_USER_SUCCESS
   });
+<<<<<<< HEAD
   Actions.MainContainer({ type: 'reset' });
+=======
+  Actions.reset('MainContainer')
+>>>>>>> origin/homefeedview
 };
 
 export const recoveryUser = ({ email }) => {
