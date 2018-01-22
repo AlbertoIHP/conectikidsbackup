@@ -46,6 +46,9 @@ import ProfileHome from '../ProfileHome'
 
 import ChatHome from '../ChatHome'
 
+import Menu from './Menu'
+
+import { Actions } from 'react-native-router-flux'
 
 const drawerCover = require("./img/BackgroundLogin.png")
 
@@ -86,6 +89,7 @@ export default class MainContainer extends Component {
       chatActive: false, 
       agendaActive: false, 
       profileActive: false,
+      menuActive: false,
       shadowOffsetWidth: 1,
       shadowRadius: 4 
     }
@@ -135,6 +139,7 @@ export default class MainContainer extends Component {
         previousState.chatActive = false
         previousState.agendaActive = false
         previousState.profileActive = false
+        previousState.menuActive = false
         return previousState
       })
     }
@@ -155,6 +160,18 @@ export default class MainContainer extends Component {
         previousState.chatActive = false
         previousState.agendaActive = true
         previousState.profileActive = false
+        previousState.menuActive = false
+        return previousState
+      })
+    }
+    else if( resp === 4)
+    {
+      this.setState( previousState => {
+        previousState.homeActive = false
+        previousState.chatActive = false
+        previousState.agendaActive = false
+        previousState.profileActive = true
+        previousState.menuActive = false
         return previousState
       })
     }
@@ -164,18 +181,20 @@ export default class MainContainer extends Component {
         previousState.homeActive = false
         previousState.chatActive = false
         previousState.agendaActive = false
-        previousState.profileActive = true
+        previousState.profileActive = false
+        previousState.menuActive = true
         return previousState
-      })
+      })      
     }
   }
 
-
-  closeDrawer = () => {
+  closeDrawer()
+  {
     this.drawer._root.close()
   }
   
-  openDrawer = () => {
+  openDrawer()
+  {
     this.drawer._root.open()
   }
 
@@ -183,7 +202,7 @@ export default class MainContainer extends Component {
   {
     return (
       <Right>
-        <Button transparent onPress={() => this.openDrawer() }>
+        <Button transparent onPress={() => Actions.AddTask() }>
           <Icon style= {{ color: "white" }} name="ios-add-outline" />
         </Button>
       </Right>
@@ -191,7 +210,8 @@ export default class MainContainer extends Component {
   }
 
 
-  render() {
+  render() 
+  {
 
 
     return (
@@ -229,6 +249,8 @@ export default class MainContainer extends Component {
             { this.state.profileActive ? <ProfileHome />: null }
 
             { this.state.agendaActive ? <AgendaHome />: null }
+
+            { this.state.menuActive ? <Menu />: null }
           </Content>
 
           <Footer style={{ backgroundColor: 'white' }}>
@@ -248,7 +270,7 @@ export default class MainContainer extends Component {
                   direction="up"
                   containerStyle={{ }}
                   style={ styles.fabIcon }
-                  onPress={() => console.log("hola") }>
+                  onPress={() => this._changeState(5) }>
                   <Icon name="add" />
                 </Fab>
               </View>
@@ -316,7 +338,7 @@ const styles = StyleSheet.create({
         position: 'relative',
         flex: 0.95,
         justifyContent: 'center',
-        marginLeft: 45,
+        marginLeft: 30,
         top: 21,
         elevation: 8,
         width: '95%'
