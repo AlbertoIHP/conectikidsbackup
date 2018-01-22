@@ -108,24 +108,15 @@ export default class MainContainer extends Component {
             </Row>
 
             <Row>
-              <List dataArray={datas} renderRow={data => <ListItem button noBorder onPress={() => console.log("Hay que cambiar al curso con ID "+data.courseId)}>
+              <List dataArray={datas} renderRow={data => 
+                <ListItem button noBorder onPress={() => console.log("Hay que cambiar al curso con ID "+data.courseId)}>
                     <Left>
                       <Icon active name={data.icon} style={ styles.IconStyle } />
                       <Text style={styles.text}>
                         {data.name}
                       </Text>
                     </Left>
-
-                    {data.types && 
-                      <Right style={{ flex: 1 }}>
-                        <Badge
-                          style={ styles.badgeStyle }  >
-                          <Text style={styles.badgeText}>
-                            {`${data.types} Types`}
-                          </Text>
-                        </Badge>
-                      </Right>}
-                  </ListItem>}/>
+                </ListItem>}/>
             </Row>
 
           </Grid>

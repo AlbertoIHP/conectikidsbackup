@@ -3,14 +3,9 @@ import { Text, StyleSheet, View, ScrollView, TouchableOpacity, Image, Dimensions
 import { Actions } from 'react-native-router-flux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
-import {
-	Button
-} from 'native-base'
-
 
 //import Post from './Post'
 import CalendarPicker from './CalendarPicker'
-// import CustomSpinner from './../../components/CustomSpinner'
 
 
 const dim = Dimensions.get('window');

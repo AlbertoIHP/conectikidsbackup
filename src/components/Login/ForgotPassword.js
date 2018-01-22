@@ -32,16 +32,19 @@ import { emailChanged, recoveryUser } from '../../actions';
 
 class ForgotPassword extends Component {
 
-  onEmailChange(text) {
+  onEmailChange(text) 
+  {
     this.props.emailChanged(text);
   }
 
-  onButtonPressRecovery() {
+  onButtonPressRecovery() 
+  {
     const { email } = this.props;
     this.props.recoveryUser({ email });
   }
 
-  renderButton() {
+  renderButton() 
+  {
       if (this.props.loading) {
         return <Spinner color='#fd6342' />;
       }
