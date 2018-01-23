@@ -4,9 +4,10 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import VideoPlayer from 'react-native-video-player';
 import EvilIcon from 'react-native-vector-icons/EvilIcons';
 import Image from 'react-native-image-progress';
-import RNFetchBlob from 'react-native-fetch-blob';
+// import RNFetchBlob from 'react-native-fetch-blob';
+import moment from 'moment';
 
-import Comments from './scenes/comments';
+import Comments from './comments';
 
 class Post extends React.Component {
 
@@ -19,32 +20,10 @@ class Post extends React.Component {
 		date = new Date(props.activity.createdAt);
 		time = "Hace mucho tiempo"
 		difMs = (new Date()).getTime() - props.activity.createdAt;
+		time = moment(date).locale("es").fromNow();
 
-		difMins = Math.round(((difMs % 86400000) % 3600000) / 60000);
-		difDays = Math.floor(difMs / 86400000); // days
-		difHrs = Math.floor((difMs % 86400000) / 3600000);
-
-		if (difDays < 1 && difHrs < 1){
-			if (difMins <= 1){
-				time = "Recientemente"
-			} else {
-				time = "Hace " + difMins + " minutos"
-			}
-		}
-		else if (difDays < 1 && difHrs < 24){
-			time = "Hace " + difHrs + " horas"
-			if (difHrs == 1){
-				time = "Hace 1 hora"
-			}
-		}
-		else if (difDays < 10){
-			time = "Hace " + difDays + " días"
-			if (difDays == 1){
-				time = "Hace 1 día"
-			}
-		}
-        var re = /(?:\.([^.]+))?$/;
-        let type = re.exec(this.props.activity.photoUrl)[1];
+    var re = /(?:\.([^.]+))?$/;
+    let type = re.exec(this.props.activity.photoUrl)[1];
 
 		this.state = {
 			time: time,
@@ -57,24 +36,24 @@ class Post extends React.Component {
 
         var me = this;
 
-        if (type == "MOV")
-        RNFetchBlob
-          .config({
-            fileCache : true,
-            // by adding this option, the temp files will have a file extension
-            appendExt : type
-          })
-          .fetch('GET', this.props.activity.photoUrl, {
-            //some headers ..
-          })
-          .then((res) => {
-            // the temp file path with file extension `png`
-            // Beware that when using a file path as Image source on Android,
-            // you must prepend "file://"" before the file path
-            me.setState({
-                path: res.path()
-            })
-          })
+        // if (type == "MOV")
+        // RNFetchBlob
+        //   .config({
+        //     fileCache : true,
+        //     // by adding this option, the temp files will have a file extension
+        //     appendExt : type
+        //   })
+        //   .fetch('GET', this.props.activity.photoUrl, {
+        //     //some headers ..
+        //   })
+        //   .then((res) => {
+        //     // the temp file path with file extension `png`
+        //     // Beware that when using a file path as Image source on Android,
+        //     // you must prepend "file://"" before the file path
+        //     me.setState({
+        //         path: res.path()
+        //     })
+        //   })
 
 	}
 
