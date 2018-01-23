@@ -15,7 +15,7 @@ LocaleConfig.locales['es'] = {
 }
 
 LocaleConfig.defaultLocale = 'es'
-
+import { socket } from '../../services/socket'
 
 class AgendaHome extends Component {
 
@@ -59,12 +59,23 @@ class AgendaHome extends Component {
       this.refreshTasks( this.props.selectedCourse, this.props.token )
     }
 
+
+    socket.on('taskAdded', ( task ) => {
+      task = JSON.parse(task)
+      console.log("ESCUCHE EL EVENTO DE AÑADIR TAREA!!!")
+      if( this.props.selectedCourse === task.course_id)
+      {
+        //this.addItem( task )
+        this.refreshTasks( this.props.selectedCourse, this.props.token )
+      }
+    })
+
     EventEmitter.on("userHasChangedCourseID", ( idCourse, token ) => {
       //AQUI SE DEBE DE HACER EL FETCH PARA OBTENER TODAS LAS TAREAS DE LA ID DEL CURSO ENTREGADA
-
-
       this.refreshTasks( idCourse, token )
     })
+
+
   }
 
 

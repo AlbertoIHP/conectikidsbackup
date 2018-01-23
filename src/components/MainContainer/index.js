@@ -188,7 +188,7 @@ export default class MainContainer extends Component {
   {
     return (
       <Right>
-        <Button transparent onPress={() => Actions.AddTask() }>
+        <Button transparent onPress={() => Actions.AddTask({text: {user: this.state.user, token: this.state.token, selectedCourse: this.state.selectedCourse } }) }>
           <Icon style= {{ color: "white" }} name="ios-add-outline" />
         </Button>
       </Right>
@@ -285,15 +285,15 @@ export default class MainContainer extends Component {
 
 
           <Content>
-            { this.state.homeActive ? <FeedHome token={ this.state.token } selectedCourse={ this.state.selectedCourse } /> : null }
+            { this.state.homeActive ? <FeedHome user={ this.state.user }  token={ this.state.token } selectedCourse={ this.state.selectedCourse } /> : null }
 
-            { this.state.chatActive ? <ChatHome /> : null }
+            { this.state.chatActive ? <ChatHome user={ this.state.user } token={ this.state.token } selectedCourse={ this.state.selectedCourse }/> : null }
 
-            { this.state.profileActive ? <ProfileHome />: null }
+            { this.state.profileActive ? <ProfileHome user={ this.state.user } token={ this.state.token } selectedCourse={ this.state.selectedCourse } />: null }
 
-            { this.state.agendaActive ? <AgendaHome token={ this.state.token } selectedCourse={ this.state.selectedCourse }/>: null }
+            { this.state.agendaActive ? <AgendaHome user={ this.state.user } token={ this.state.token } selectedCourse={ this.state.selectedCourse }/>: null }
 
-            { this.state.menuActive ? <Menu />: null }
+            { this.state.menuActive ? <Menu user={ this.state.user } token={ this.state.token } selectedCourse={ this.state.selectedCourse } />: null }
           </Content>
 
           <Footer style={{ backgroundColor: 'white' }}>

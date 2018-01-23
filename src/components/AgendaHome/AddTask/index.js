@@ -12,7 +12,7 @@ import {
   Platform,
   Picker
 } from 'react-native'
-
+import { Spinner } from 'native-base'
 import { Actions } from 'react-native-router-flux'
 import CalendarPicker from '../../FeedHome/CalendarPicker'
 import { LinearGradient } from 'expo'
@@ -37,7 +37,9 @@ import {
   Row,
   Column
 } from "native-base"
+import { taskService } from '../../../services/Task.service'
 
+import { socket } from '../../../services/socket'
 
 class AddTask extends Component {
 
@@ -47,12 +49,20 @@ class AddTask extends Component {
     super(props)
 
     this.state = {
+      newTask: {
       name: '',
-      description: '',
-      hour: '00',
-      minute: '00' ,
-      selectedDate: (today.toISOString()).slice(0,10),
+        description: '',
+        hour: '00',
+        minute: '00' ,
+        selectedDate: (today.toISOString()).slice(0,10),
+        course_id: this.props.text.selectedCourse,
+        createdBy_id: this.props.text.user.id
+      },
+      loading: false
     }
+
+    console.log("DEBUGGING AGENDAHOME")
+    console.log(this.state)
 
     hours = []
     minutes = []
@@ -113,14 +123,20 @@ class AddTask extends Component {
 
   changeName(text)
   {
-    this.setState({ name: text })
+    this.setState( previousState => {
+      previousState.newTask.name = text
+      return previousState
+    })
   }
 
 
 
   changeDescription(text)
   {
-    this.setState({ description: text })
+    this.setState( previousState => {
+      previousState.newTask.description = text
+      return previousState
+    })
   }
 
 
@@ -130,25 +146,48 @@ class AddTask extends Component {
 
 
   	console.log("Aqui deber ir la logica para publicar la tarea")
-    console.log(JSON.stringify(this.state))
-      // previousState = {
-      // name: this.state.name,
-      // description: this.state.description,
-      // timeof: this.state.hour+':'+this.state.minute,
-      // selectedDate: this.state.selectedDate,
-      // }
 
-      // let userId = Auth.user().uid;
-      // Database.publishTask(userId, previousState).then(function(value){
-      //   //Actions.pop({refresh: {children: 'update'}})
-      //   console.log("the value", value);
-      //   this.props.onEnter();
-      // }.bind(this)).catch(function(error){
-      //   console.log(error);
-      // });
+    if( this.state.newTask.name === '' || this.state.newTask.description === '')
+    {
+      console.log("Deben llenarse los campos")
+    }
+    else
+    {
+      this.changeLoading( true )
+
+      let newTask = {
+        name: this.state.newTask.name.name,
+        description: this.state.newTask.description.description,
+        timeof: this.state.newTask.hour+':'+this.state.newTask.minute,
+        selectedDate: this.state.newTask.selectedDate,
+        course_id: this.state.newTask.course_id,
+        createdBy_id: this.state.newTask.createdBy_id
+      }
+
+      taskService.store( newTask ).then( ( response ) => {
+        //EMISION DEL EVENTO
+        socket.emit('taskAdded', JSON.stringify(newTask) )
+        
+        Actions.pop()
+        this.changeLoading( false )
+      }).catch( ( error ) => {
+        console.log( error )
+        this.changeLoading( false )
+      })
+
+    }
+
+
   }
 
 
+  changeLoading( state )
+  {
+    this.setState( previousState => {
+      previousState.loading = state
+      return previousState
+    })
+  }
 
 
   getStartDay(date)
@@ -167,8 +206,10 @@ class AddTask extends Component {
   {
     console.log(date);
     newDate =  this.getStartDay(date)
-    this.setState({
-      selectedDate: (newDate.toISOString()).slice(0,10),
+
+    this.setState( previousState => {
+      previousState.newTask.selectedDate =(newDate.toISOString()).slice(0,10)
+      return previousState
     })
   }
 
@@ -179,7 +220,7 @@ class AddTask extends Component {
   changeHour( value )
   {
     this.setState( previousState => {
-      previousState.hour = value
+      previousState.newTask.hour = value
 
       return previousState
     })
@@ -191,13 +232,74 @@ class AddTask extends Component {
   changeMinute( value )
   {
     this.setState( previousState => {
-      previousState.minute = value
+      previousState.newTask.minute = value
 
 
       return previousState
     })
   }
 
+  renderContent()
+  {
+    if( this.state.loading )
+    {
+      return (
+        <Spinner color='#fd6342' />
+        )
+    }
+    else
+    {
+      return (
+            <View style={styles.container}>
+
+              <CalendarPicker onDateChange={this._onDateChange}/>
+              
+            <View style={{ marginTop: 25, flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+              <Picker
+              selectedValue={ this.state.newTask.hour } 
+              style={{ width: '45%'}} 
+              onValueChange={(itemValue, itemIndex) => this.changeHour( itemValue )} >
+                { this.renderItem('hour') }
+              </Picker>
+
+              <Text style={{ marginTop: 15}} >:</Text>
+
+              <Picker
+              selectedValue={ this.state.newTask.minute }  
+              style={{ width: '45%'}}  
+              onValueChange={(itemValue, itemIndex) => this.changeMinute( itemValue )} >
+                { this.renderItem('minute') }
+              </Picker>
+            </View>
+
+              <TextInput
+                maxLength={100}
+                style={[styles.textInput]}
+                onFocus={() => this.onNameFocus()}
+                multiline={true}
+                numberOfLines={2}
+                onChangeText={(name) => this.changeName({name})}
+                placeholder="Nombre"
+                value={this.state.newTask.name}/>
+
+
+              <TextInput
+                maxLength={100}
+                style={[styles.textInput]}
+                onFocus={() => this.onDescriptionFocus()}
+                multiline={true}
+                numberOfLines={2}
+                onChangeText={(description) => this.changeDescription({description})}
+                placeholder="Descripción"
+                value={this.state.newTask.description}/>
+
+              <TouchableOpacity onPress={this._publishTask} style={styles.button}>
+                <Image source={require('./img/publicar.png')}/>
+              </TouchableOpacity>
+            </View>  
+        )    
+    }
+  }
 
   onDescriptionFocus()
   {
@@ -226,7 +328,7 @@ class AddTask extends Component {
               <Header style={{ backgroundColor: 'transparent' }}>
 
                 <Left>
-                  <Button transparent onPress={() => Actions.reset('MainContainer') } >
+                  <Button transparent onPress={() => Actions.pop() } >
                     <Icon style= {{ color: "white" }} name="arrow-back" />
                   </Button>
                 </Left>
@@ -241,53 +343,7 @@ class AddTask extends Component {
 
 
           <Content style={{ backgroundColor: 'white'}} >
-            <View style={styles.container}>
-
-              <CalendarPicker onDateChange={this._onDateChange}/>
-              
-	          <View style={{ marginTop: 25, flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-	            <Picker
-	            selectedValue={ this.state.hour } 
-	            style={{ width: '45%'}} 
-	            onValueChange={(itemValue, itemIndex) => this.changeHour( itemValue )} >
-	              { this.renderItem('hour') }
-	            </Picker>
-
-	            <Text style={{ marginTop: 15}} >:</Text>
-
-	            <Picker
-	            selectedValue={ this.state.minute }  
-	            style={{ width: '45%'}}  
-	            onValueChange={(itemValue, itemIndex) => this.changeMinute( itemValue )} >
-	              { this.renderItem('minute') }
-	            </Picker>
-	          </View>
-
-              <TextInput
-                maxLength={100}
-                style={[styles.textInput]}
-                onFocus={() => this.onNameFocus()}
-                multiline={true}
-                numberOfLines={2}
-                onChangeText={(name) => this.changeName({name})}
-                placeholder="Nombre"
-                value={this.state.name}/>
-
-
-              <TextInput
-                maxLength={100}
-                style={[styles.textInput]}
-                onFocus={() => this.onDescriptionFocus()}
-                multiline={true}
-                numberOfLines={2}
-                onChangeText={(description) => this.changeDescription({description})}
-                placeholder="Descripción"
-                value={this.state.description}/>
-
-              <TouchableOpacity onPress={this._publishTask} style={styles.button}>
-                <Image source={require('./img/publicar.png')}/>
-              </TouchableOpacity>
-            </View>
+            { this.renderContent() }
           </Content>
         </Container>
     )
