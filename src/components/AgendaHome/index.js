@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import { View, Text, StyleSheet, Button, Image, TouchableHighlight, TouchableOpacity } from 'react-native'
-
+import EventEmitter from "react-native-eventemitter"
+import { taskService } from '../../services/Task.service'
 import { Agenda } from 'react-native-calendars'
 import { LocaleConfig } from 'react-native-calendars'
 import Modal from 'react-native-modal'
@@ -25,11 +26,41 @@ class AgendaHome extends Component {
       isModalVisible: false,
       currentNameTask: '',
       currentDescriptionTask: '',
-      currentTimeOfTask: ''
+      currentTimeOfTask: '',
+      tasks: []
     }
     this.addItem = this.addItem.bind(this)
     this.refreshTasks()
   }
+
+
+  componentDidMount()
+  {
+
+    EventEmitter.on("userHasChangedCourseID", ( idCourse, token ) => {
+      //AQUI SE DEBE DE HACER EL FETCH PARA OBTENER TODAS LAS TAREAS DE LA ID DEL CURSO ENTREGADA
+      console.log(token)
+      console.log(idCourse)
+      console.log("ESCUCHE EL EVENTO ACUTALIZANDO CONTENIDO A LA ID DEL CURSO")
+      taskService.getTasksByCourseId( idCourse, token ).then( ( response ) => {
+        this.changeTasks( response.data.coursetasks )
+      }).catch( ( error ) => {
+        console.log( error )
+      })
+
+    })
+  }
+
+
+  changeTasks( tasks )
+  {
+    this.setState( previousState => {
+      previousState.tasks = tasks
+      return previousState
+    })
+  }
+
+
 
   _selectDate()
   {

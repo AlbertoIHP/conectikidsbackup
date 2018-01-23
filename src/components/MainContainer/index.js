@@ -76,7 +76,8 @@ export default class MainContainer extends Component {
       shadowRadius: 4,
       user: {},
       token: '',
-      datas: []
+      datas: [],
+      selectedCourse: ''
     }
   }
 
@@ -117,6 +118,8 @@ export default class MainContainer extends Component {
 
     if( resp === 1)
     {
+
+      
       this.setState( previousState => {
         previousState.homeActive = true
         previousState.chatActive = false
@@ -192,8 +195,18 @@ export default class MainContainer extends Component {
       )
   }
 
+  changeSelectedCourse( courseId )
+  {
+    this.setState( previousState => {
+      previousState.selectedCourse = courseId
+      return previousState
+    })
+  }
+
   changeCourseId( id, token )
   {
+    this.changeSelectedCourse( id )
+    this.closeDrawer()
     EventEmitter.emit("userHasChangedCourseID", id, token )
   }
 
@@ -272,13 +285,13 @@ export default class MainContainer extends Component {
 
 
           <Content>
-            { this.state.homeActive ? <FeedHome/> : null }
+            { this.state.homeActive ? <FeedHome selectedCourse={ this.state.selectedCourse } /> : null }
 
             { this.state.chatActive ? <ChatHome /> : null }
 
             { this.state.profileActive ? <ProfileHome />: null }
 
-            { this.state.agendaActive ? <AgendaHome />: null }
+            { this.state.agendaActive ? <AgendaHome selectedCourse={ this.state.selectedCourse }/>: null }
 
             { this.state.menuActive ? <Menu />: null }
           </Content>

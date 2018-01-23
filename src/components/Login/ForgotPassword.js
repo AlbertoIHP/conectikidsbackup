@@ -1,13 +1,13 @@
 /* @flow */
 
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import {
   Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   Platform
-} from 'react-native';
+} from 'react-native'
 import {
   Container,
   Content,
@@ -24,33 +24,62 @@ import {
   Body,
   Right,
   Spinner
-} from 'native-base';
-import { LinearGradient } from 'expo';
-import { Actions } from 'react-native-router-flux';
-import { connect } from 'react-redux';
-import { emailChanged, recoveryUser } from '../../actions';
+} from 'native-base'
+import { LinearGradient } from 'expo'
+import { Actions } from 'react-native-router-flux'
+import { forgotService } from '../../services/ForgotPassword.service'
 
-class ForgotPassword extends Component {
 
-  onEmailChange(text) 
+
+export default class ForgotPassword extends Component {
+
+  constructor( props )
   {
-    this.props.emailChanged(text);
+    super( props )
+
+
+    this.state = { email: '', loading: false }
   }
 
-  onButtonPressRecovery() 
+  changeEmail( email )
   {
-    const { email } = this.props;
-    this.props.recoveryUser({ email });
+    this.setState( previousState => {
+      previousState.email = email
+      return previousState
+    })
+  }
+
+  changeLoading( state )
+  {
+    this.setState( previousState => {
+      previousState.loading = state
+      return previousState
+    })
+  }
+
+
+  recoverPass() 
+  {
+    this.changeLoading( true )
+    forgotService.sendMail(this.state.email).then( ( response ) => {
+      console.log( response )
+      this.changeLoading( false )
+    }).catch( ( error ) => {
+      console.log( error )
+      this.changeLoading( false )
+    })
+
+
   }
 
   renderButton() 
   {
-      if (this.props.loading) {
+      if (this.state.loading) {
         return <Spinner color='#fd6342' />;
       }
 
       return (
-        <TouchableOpacity style={styles.touchable} onPress={() => this.onButtonPressRecovery()}>
+        <TouchableOpacity style={styles.touchable} onPress={() => this.recoverPass()}>
           <LinearGradient
             colors={['#fd7292', '#fd6342']}
             style={styles.gradientButton}
@@ -162,14 +191,4 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToPros = ({ auth }) => {
-  const { email, password, error2, loading } = auth;
-    return {
-      email,
-      password,
-      error2,
-      loading
-    };
-};
 
-export default connect(mapStateToPros, { emailChanged, recoveryUser })(ForgotPassword);

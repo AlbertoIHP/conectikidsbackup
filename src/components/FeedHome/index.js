@@ -29,7 +29,6 @@ import {
 //import Post from './Post'
 import CalendarPicker from './CalendarPicker'
 import { activityService } from '../../services/Activity.service'
-import { storage } from '../../services/localStorage.service'
 
 const dim = Dimensions.get('window');
 
@@ -46,7 +45,6 @@ class FeedHome extends Component {
     activities = []
     activities[today.getTime()] = []
     selected = activities[today.getTime()]
-
 
     this.state = {
       activities: activities,
@@ -65,8 +63,6 @@ class FeedHome extends Component {
 
     EventEmitter.on("userHasChangedCourseID", ( idCourse, token ) => {
       //AQUI SE DEBE DE HACER EL FETCH PARA OBTENER TODAS LAS HISTORIAS DE LA ID DEL CURSO ENTREGADA
-      console.log(token)
-      console.log(idCourse)
       console.log("ESCUCHE EL EVENTO ACUTALIZANDO CONTENIDO A LA ID DEL CURSO")
       activityService.getActivitiesByCourseId( idCourse, token ).then( ( response ) => {
         this.changeActivities( response.data.courseActivities )
@@ -85,25 +81,6 @@ class FeedHome extends Component {
       return previousState
     })
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
   getStartDay(date)
@@ -210,7 +187,8 @@ class FeedHome extends Component {
 
   render()
   {
-    console.log(this.state.activities)
+
+    console.log("HOLAAAAAAAAAAAAAA")
     if(this.state.loading){
       return(
         <CustomSpinner/>

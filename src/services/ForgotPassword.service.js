@@ -25,6 +25,4 @@ class ForgotPasswordService {
 	}
 
 }
-
-
-export default ForgotPasswordService;
+export const forgotService = new ForgotPasswordService();
