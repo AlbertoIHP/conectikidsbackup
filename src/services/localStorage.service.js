@@ -19,7 +19,7 @@ class localStorage {
   {
     try
     {
-      return await AsyncStorage.getItem('@localStorage:'+objectName)
+      return JSON.parse( await AsyncStorage.getItem('@localStorage:'+objectName) ) 
     }
     catch( error )
     {

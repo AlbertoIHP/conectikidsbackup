@@ -1,12 +1,35 @@
 import React, {Component} from 'react'
-import { Text, StyleSheet, View, ScrollView, TouchableOpacity, Image, Dimensions } from 'react-native'
+import { StyleSheet, View, ScrollView, TouchableOpacity, Image, Dimensions  } from 'react-native'
 import { Actions } from 'react-native-router-flux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-
+import EventEmitter from "react-native-eventemitter"
+import {
+  Container,
+  Header,
+  Title,
+  Content,
+  Button,
+  Footer,
+  FooterTab,
+  Body,
+  Left,
+  Right,
+  Icon,
+  Text,
+  Fab,
+  Drawer,
+  List,
+  Badge,
+  ListItem,
+  Grid,
+  Row,
+  Column
+} from "native-base"
 
 //import Post from './Post'
 import CalendarPicker from './CalendarPicker'
-
+import { activityService } from '../../services/Activity.service'
+import { storage } from '../../services/localStorage.service'
 
 const dim = Dimensions.get('window');
 
@@ -20,9 +43,10 @@ class FeedHome extends Component {
     this.openComments = this.openComments.bind(this)
 
     today = this.getStartDay(new Date())
-    activities = {}
+    activities = []
     activities[today.getTime()] = []
     selected = activities[today.getTime()]
+
 
     this.state = {
       activities: activities,
@@ -34,6 +58,53 @@ class FeedHome extends Component {
     this.getActivities(today)
 
   }
+
+
+  componentDidMount()
+  {
+
+    EventEmitter.on("userHasChangedCourseID", ( idCourse, token ) => {
+      //AQUI SE DEBE DE HACER EL FETCH PARA OBTENER TODAS LAS HISTORIAS DE LA ID DEL CURSO ENTREGADA
+      console.log(token)
+      console.log(idCourse)
+      console.log("ESCUCHE EL EVENTO ACUTALIZANDO CONTENIDO A LA ID DEL CURSO")
+      activityService.getActivitiesByCourseId( idCourse, token ).then( ( response ) => {
+        this.changeActivities( response.data.courseActivities )
+      }).catch( ( error ) => {
+        console.log( error )
+      })
+
+    })
+  }
+
+  changeActivities( activities )
+  {
+    this.setState( previousState => {
+      previousState.activities = activities
+      console.log( "Las actividades son:  (DEBUG: LINEA 47 FEEDHOME->Index.js)")
+      return previousState
+    })
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   getStartDay(date)
   {
@@ -112,8 +183,34 @@ class FeedHome extends Component {
 
   }
 
+  _renderContent()
+  {
+    if( this.state.activities.length <= 0 )
+    {
+      return (
+        <Text> No hay actividades que mostrar</Text>
+        )
+    }
+
+    console.log( this.state.activites )
+
+
+    return(
+        <List dataArray={ this.state.activities } renderRow={data => 
+          <ListItem button noBorder onPress={() => console.log(data.name) }>
+           <Left>
+             <Text>
+               {data.name}
+              </Text>
+                    </Left>
+        </ListItem>}/>
+      )
+
+  }
+
   render()
   {
+    console.log(this.state.activities)
     if(this.state.loading){
       return(
         <CustomSpinner/>
@@ -123,15 +220,12 @@ class FeedHome extends Component {
 
       <View style={styles.container}>
         <View style={{height: 30}}></View>
-        <CalendarPicker onDateChange={this._onDateChange}/>
+          <CalendarPicker onDateChange={this._onDateChange}/>
         <View style={{height: 10}}></View>
 
         <View>
-          { this.state.selectedActivities.map((prop, key) => {
-             return (
-              <Post key={key} onComments={this.openComments} activity={prop}/>
-             );
-          })}
+          { this._renderContent() }
+
         </View>
       </View>
     )

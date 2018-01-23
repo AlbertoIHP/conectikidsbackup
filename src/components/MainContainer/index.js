@@ -56,11 +56,10 @@ const drawerCover = require("./img/BackgroundLogin.png")
 
 const drawerImage = require("./img/logoname.png")
 
+import EventEmitter from "react-native-eventemitter"
 
+  
 
-
-
- //HARDCODEADO ESTA MATRIZ DEBE GENERARSE HACIENDO EL FETCH AL ENDPOINT QUE ENTREGA LOS CURSOS A PARTIR DE LA ID DEL PROFE
 export default class MainContainer extends Component {
 
   constructor(props)
@@ -89,19 +88,27 @@ export default class MainContainer extends Component {
 
 
     courseService.getCoursesByProfessorId( user.id, token ).then( ( response ) => {
-      console.log( response.data )
+      this.setState( (previousState) => {
+        previousState.token = token
+        previousState.user = user
+        previousState.datas = response.data.teacherCourses
+
+
+        //TOMAMOS POR DEFECTO EL PRIMER CURSO DEL PROFESOR, Y EMITIMOS EL EVENTO CON SU ID
+        //ENTONCES, EL FEED Y LA AGENDA DESATARAN EL EVENTO DE OBTENER LAS ACTIVIDADES Y TAREAS
+        //RESPECTIVAMENTE, SIEMPRE DEPENDIENDO DE LA ID, ENTONCES, CUANDO SE CAMBIE DE ID, SE EMITIRA
+        //NUEVAMENTE ESTE EVENTO, DE MANERA QUE, TODO SU CONETENIDO, SERA RECARGADO
+        this.changeCourseId( previousState.datas[0].id, previousState.token )
+      
+        return previousState
+      })      
     } ).catch( ( error ) => {
       console.log( error )
     })
     
 
 
-    this.setState( (previousState) => {
-      previousState.token = token
-      previousState.user = user
-      console.log(previousState)
-      return previousState
-    })
+
   }
 
 
@@ -185,6 +192,10 @@ export default class MainContainer extends Component {
       )
   }
 
+  changeCourseId( id, token )
+  {
+    EventEmitter.emit("userHasChangedCourseID", id, token )
+  }
 
 
   _renderDrawerContent()
@@ -202,10 +213,10 @@ export default class MainContainer extends Component {
             </Row>
 
             <Row>
-              <List dataArray={this.state.datas} renderRow={data => 
-                <ListItem button noBorder onPress={() => console.log("Hay que cambiar al curso con ID "+data.courseId)}>
+              <List dataArray={ this.state.datas } renderRow={data => 
+                <ListItem button noBorder onPress={() => this.changeCourseId( data.id, this.state.token ) }>
                     <Left>
-                      <Icon active name={data.icon} style={ styles.IconStyle } />
+                      <Icon active name={"ios-people-outline"} style={ styles.IconStyle } />
                       <Text style={styles.text}>
                         {data.name}
                       </Text>
@@ -261,7 +272,7 @@ export default class MainContainer extends Component {
 
 
           <Content>
-            { this.state.homeActive ? <FeedHome /> : null }
+            { this.state.homeActive ? <FeedHome/> : null }
 
             { this.state.chatActive ? <ChatHome /> : null }
 

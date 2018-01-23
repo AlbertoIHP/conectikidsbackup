@@ -61,12 +61,23 @@ class ActivityService {
 		activity.access_token = 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP'
 
 		return http.post( 'activities', JSON.stringify( activity ) )
-		
+	}
 
+
+	getActivitiesByCourseId( id, token )
+	{
+		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token }
+
+		console.log(headers)
+
+		let http = axios.create({ baseURL: base.api,  headers: headers	})
+
+
+		return http.get('activities/getCourseActivities/'+id)
 
 	}
 
+
 }
 
-
-export default ActivityService
+export const activityService = new ActivityService();
