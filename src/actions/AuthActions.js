@@ -10,10 +10,10 @@ import {
   RECOVERY_PASSWORD_FAIL,
   RECOVERY_PASSWORD_SUCCESS
 } from './types';
-import AuthService from '../services/Auth.service';
+//import AuthService from '../services/Auth.service';
 import ForgotPasswordService from '../services/ForgotPassword.service';
 
-const authServices = new AuthService();
+//const authServices = new AuthService();
 const forgotPasswordServices = new ForgotPasswordService();
 
 export const emailChanged = (text) => {

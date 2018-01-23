@@ -11,52 +11,94 @@ Icon,
 Label,
 Input,
 Form,
-Spinner
+Spinner,
+Row,
+Grid
 } from 'native-base';
-import { Row, Grid } from 'react-native-easy-grid';
 import { Image, StyleSheet, Text, TouchableOpacity, Platform } from 'react-native';
 import { LinearGradient } from 'expo';
-import { connect } from 'react-redux';
 import { Actions } from 'react-native-router-flux';
-import { emailChanged, passwordChanged, loginUser } from '../../actions';
+
+import { authService } from '../../services/Auth.service'
+import { storage } from '../../services/localStorage.service'
+
+
 
 class Welcome extends Component {
 
-  onEmailChange(text) 
+  constructor( props )
   {
-    this.props.emailChanged(text);
-  }
-  onPasswordChange(text) 
-  {
-    this.props.passwordChanged(text);
+    super( props )
+
+    this.state = {
+      email: 'a.herrera07@ufromail.cl',
+      password: 'alberto123',
+      logeando: ''
+    }
+
   }
 
-  onButtonPress() 
+
+  changeEmail( email )
   {
-    const { email, password } = this.props;
-    this.props.loginUser({ email, password });
+    this.setState( previousState => {
+      previousState.email = email
+      return previousState
+    })
   }
 
-  onTextPress1() 
+  changePassword( pass )
   {
-    Actions.ForgotPassword();
+    this.setState( previousState => {
+      previousState.password = pass
+      return previousState
+    })
   }
+
+
+  changeLoading( state )
+  {
+    this.setState( previousState => {
+      previousState.loading = state
+      return previousState
+    })
+  }
+
+  async singIn()
+  {
+    this.changeLoading( true )
+
+  await authService.login( { email: this.state.email, password: this.state.password} )
+  .then( async ( response ) => {
+    await storage.setItem( 'token', response.data.token )
+    await storage.setItem( 'currentUser', response.data.user)
+    this.changeLoading( false )
+    Actions.reset('MainContainer')
+  })
+  .catch( ( error ) => {
+    console.log(error)
+    this.changeLoading( false )
+  });
+  }
+
+
+
+
+
+
 
   renderButton() 
   {
-      if (this.props.loading) {
+      if ( this.state.loading ) 
         return <Spinner color='#fd6342' />;
-      }
+      
       return (
 
-        <TouchableOpacity style={styles.touchable} onPress={() => this.onButtonPress()}>
-          <LinearGradient
-            colors={['#fd7292', '#fd6342']}
-            style={styles.gradient}
-          >
-            <Text
-              style={styles.buttonText}
-            >Iniciar Sesión</Text>
+        <TouchableOpacity style={styles.touchable} onPress={() => this.singIn()}>
+          <LinearGradient colors={['#fd7292', '#fd6342']} style={styles.gradient} >
+            <Text style={styles.buttonText} >
+              Iniciar Sesión
+            </Text>
           </LinearGradient>
         </TouchableOpacity>
     );
@@ -76,39 +118,38 @@ class Welcome extends Component {
             </Row>
 
             <Row size={70}>
-              <Card style={{ marginLeft: 10, marginRight: 10 }}>
+              <Card style={ styles.cardStyle }>
                 <Form>
                   <Item floatingLabel>
                     <Label>
-                      <Icon name='mail' style={{ fontSize: 20, color: 'grey', marginRight: 50 }} />
+                      <Icon name='mail' style={ styles.iconInput } />
                          test@gmail.com
                     </Label>
                     <Input
-                      onChangeText={this.onEmailChange.bind(this)}
-                      value={this.props.email}
+                      onChangeText={ ( value ) => this.changeEmail( value ) }
+                      value={this.state.email}
                     />
                   </Item>
                   <Item floatingLabel last>
                     <Label>
-                      <Icon name='lock' style={{ fontSize: 20, color: 'grey', marginRight: 50 }} />
+                      <Icon name='lock' style={ styles.iconInput } />
                       Contraseña
                     </Label>
                     <Input
                       secureTextEntry
-                      onChangeText={this.onPasswordChange.bind(this)}
-                      value={this.props.password}
+                      onChangeText={ ( value ) => this.changePassword( value ) }
+                      value={this.state.password}
                     />
                   </Item>
                 </Form>
                 {this.renderButton()}
                 <Body>
-                  <Text style={styles.errorTextStyle}>
+                  <Text style={ styles.errorTextStyle }>
                     {this.props.error}
                   </Text>
-                  <Text
-                    style={{ fontSize: 15, textDecorationLine: 'underline', marginTop: 20 }}
-                    onPress={this.onTextPress1}
-                  >¿ Has olvidado tu contraseña ?</Text>
+                  <Text style={ styles.forgotStyle } onPress={ () => Actions.ForgotPassword() }>
+                    ¿ Has olvidado tu contraseña ?
+                  </Text>
                 </Body>
               </Card>
             </Row>
@@ -167,17 +208,39 @@ const styles = StyleSheet.create({
     fontSize: 15,
     alignSelf: 'center',
     color: 'red'
+  },
+  forgotStyle:
+  { 
+    fontSize: 15, 
+    textDecorationLine: 'underline', 
+    marginTop: 20 
+  },
+  iconInput:
+  { 
+    fontSize: 20, 
+    color: 'grey', 
+    marginRight: 50 
+  },
+  cardStyle:
+  { 
+    marginLeft: 10, 
+    marginRight: 10 
   }
 });
 
-const mapStateToPros = ({ auth }) => {
-  const { email, password, error, loading } = auth;
-    return {
-      email,
-      password,
-      error,
-      loading
-    };
-};
 
-export default connect(mapStateToPros, { emailChanged, passwordChanged, loginUser })(Welcome);
+export default Welcome;
+
+
+
+// const mapStateToPros = ({ auth }) => {
+//   const { email, password, error, loading } = auth;
+//     return {
+//       email,
+//       password,
+//       error,
+//       loading
+//     };
+// };
+
+// export default connect(mapStateToPros, { emailChanged, passwordChanged, loginUser })(Welcome);

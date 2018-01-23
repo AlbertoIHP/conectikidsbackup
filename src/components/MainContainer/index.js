@@ -35,6 +35,8 @@ import {
 
 const deviceHeight = Dimensions.get("window").height
 const deviceWidth = Dimensions.get("window").width
+import { storage } from '../../services/localStorage.service'
+import { courseService } from '../../services/Course.service'
 
 import { LinearGradient } from 'expo'
 
@@ -56,28 +58,9 @@ const drawerImage = require("./img/logoname.png")
 
 
 
+
+
  //HARDCODEADO ESTA MATRIZ DEBE GENERARSE HACIENDO EL FETCH AL ENDPOINT QUE ENTREGA LOS CURSOS A PARTIR DE LA ID DEL PROFE
-const datas = [
-  {
-    name: "Curso 1",
-    courseId: "123",
-    icon: "ios-people-outline"
-  },
-  {
-    name: "Curso 2",
-    courseId: "345",
-    icon: "ios-people-outline"
-  },
-  {
-    name: "Curso 3",
-    courseId: "567",
-    icon: "ios-people-outline"
-  }
-
-]
-
-
-
 export default class MainContainer extends Component {
 
   constructor(props)
@@ -91,43 +74,36 @@ export default class MainContainer extends Component {
       profileActive: false,
       menuActive: false,
       shadowOffsetWidth: 1,
-      shadowRadius: 4 
+      shadowRadius: 4,
+      user: {},
+      token: '',
+      datas: []
     }
   }
 
 
-
-  _renderDrawerContent()
+  async componentDidMount()
   {
-    return (
-      <Container>
-        <Content bounces={false} style={ styles.drawContainerStyle }>
-          <Grid>
-            <Row >
-              <Image source={ drawerCover} style={ styles.drawerCoverStyle } />
-              <Image style={ styles.logoNameStyle } source={ drawerImage } />
-            </Row>
-            <Row>            
-              <Text> Mis Cursos </Text>
-            </Row>
+    let token =  await storage.getItem( 'token' )
+    let user =  await storage.getItem( 'currentUser' )
 
-            <Row>
-              <List dataArray={datas} renderRow={data => 
-                <ListItem button noBorder onPress={() => console.log("Hay que cambiar al curso con ID "+data.courseId)}>
-                    <Left>
-                      <Icon active name={data.icon} style={ styles.IconStyle } />
-                      <Text style={styles.text}>
-                        {data.name}
-                      </Text>
-                    </Left>
-                </ListItem>}/>
-            </Row>
 
-          </Grid>
-        </Content>
-      </Container>
-      )
+    courseService.getCoursesByProfessorId( user.id, token ).then( ( response ) => {
+      console.log( response.data )
+    } ).catch( ( error ) => {
+      console.log( error )
+    })
+    
+
+
+    this.setState( (previousState) => {
+      previousState.token = token
+      previousState.user = user
+      console.log(previousState)
+      return previousState
+    })
   }
+
 
   _changeState( resp )
   {
@@ -206,6 +182,40 @@ export default class MainContainer extends Component {
           <Icon style= {{ color: "white" }} name="ios-add-outline" />
         </Button>
       </Right>
+      )
+  }
+
+
+
+  _renderDrawerContent()
+  {
+    return (
+      <Container>
+        <Content bounces={false} style={ styles.drawContainerStyle }>
+          <Grid>
+            <Row >
+              <Image source={ drawerCover} style={ styles.drawerCoverStyle } />
+              <Image style={ styles.logoNameStyle } source={ drawerImage } />
+            </Row>
+            <Row>            
+              <Text> Mis Cursos </Text>
+            </Row>
+
+            <Row>
+              <List dataArray={this.state.datas} renderRow={data => 
+                <ListItem button noBorder onPress={() => console.log("Hay que cambiar al curso con ID "+data.courseId)}>
+                    <Left>
+                      <Icon active name={data.icon} style={ styles.IconStyle } />
+                      <Text style={styles.text}>
+                        {data.name}
+                      </Text>
+                    </Left>
+                </ListItem>}/>
+            </Row>
+
+          </Grid>
+        </Content>
+      </Container>
       )
   }
 

@@ -76,4 +76,4 @@ class AuthService {
 }
 
 
-export default AuthService;
+export const authService = new AuthService();

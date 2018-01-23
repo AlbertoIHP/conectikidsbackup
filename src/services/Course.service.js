@@ -34,7 +34,7 @@ class CourseService {
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-			return http.put('courses/'+id, course)
+		return http.put('courses/'+id, course)
 			
 
 	}
@@ -62,12 +62,19 @@ class CourseService {
 
 
 			return http.post( 'courses', JSON.stringify( course ) )
-			
+	}
 
+	getCoursesByProfessorId ( professorId, token )
+	{
 
+		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token }
+
+		let http = axios.create({ baseURL: base.api,  headers: headers	})
+
+		return http.get('courses/getcoursebyuser/'+id)
 	}
 
 }
 
 
-export default CourseService
+export const courseService = new CourseService();
