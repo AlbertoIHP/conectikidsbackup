@@ -71,7 +71,19 @@ class TaskService {
 
 	}
 
+	getTasksByCourseId ( id, token )
+	{
+
+		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token }
+
+		let http = axios.create({ baseURL: base.api,  headers: headers	})
+
+
+		return http.get('tasks/gettasksbycourseid/'+id)
+			
+
+	}
+
 }
 
-
-export default TaskService
+export const taskService = new TaskService();

@@ -35,6 +35,8 @@ import {
 
 const deviceHeight = Dimensions.get("window").height
 const deviceWidth = Dimensions.get("window").width
+import { storage } from '../../services/localStorage.service'
+import { courseService } from '../../services/Course.service'
 
 import { LinearGradient } from 'expo'
 
@@ -46,34 +48,17 @@ import ProfileHome from '../ProfileHome'
 
 import ChatHome from '../ChatHome'
 
+import Menu from './Menu'
+
+import { Actions } from 'react-native-router-flux'
 
 const drawerCover = require("./img/BackgroundLogin.png")
 
 const drawerImage = require("./img/logoname.png")
 
+import EventEmitter from "react-native-eventemitter"
 
-
- //HARDCODEADO ESTA MATRIZ DEBE GENERARSE HACIENDO EL FETCH AL ENDPOINT QUE ENTREGA LOS CURSOS A PARTIR DE LA ID DEL PROFE
-const datas = [
-  {
-    name: "Curso 1",
-    courseId: "123",
-    icon: "ios-people-outline"
-  },
-  {
-    name: "Curso 2",
-    courseId: "345",
-    icon: "ios-people-outline"
-  },
-  {
-    name: "Curso 3",
-    courseId: "567",
-    icon: "ios-people-outline"
-  }
-
-]
-
-
+  
 
 export default class MainContainer extends Component {
 
@@ -86,55 +71,61 @@ export default class MainContainer extends Component {
       chatActive: false, 
       agendaActive: false, 
       profileActive: false,
+      menuActive: false,
       shadowOffsetWidth: 1,
-      shadowRadius: 4 
+      shadowRadius: 4,
+      user: {},
+      token: '',
+      datas: [],
+      selectedCourse: ''
     }
   }
 
 
-
-  _renderDrawerContent()
+  async componentDidMount()
   {
-    return (
-      <Container>
-        <Content bounces={false} style={ styles.drawContainerStyle }>
-          <Grid>
-            <Row >
-              <Image source={ drawerCover} style={ styles.drawerCoverStyle } />
-              <Image style={ styles.logoNameStyle } source={ drawerImage } />
-            </Row>
-            <Row>            
-              <Text> Mis Cursos </Text>
-            </Row>
+    let token =  await storage.getItem( 'token' )
+    let user =  await storage.getItem( 'currentUser' )
 
-            <Row>
-              <List dataArray={datas} renderRow={data => 
-                <ListItem button noBorder onPress={() => console.log("Hay que cambiar al curso con ID "+data.courseId)}>
-                    <Left>
-                      <Icon active name={data.icon} style={ styles.IconStyle } />
-                      <Text style={styles.text}>
-                        {data.name}
-                      </Text>
-                    </Left>
-                </ListItem>}/>
-            </Row>
 
-          </Grid>
-        </Content>
-      </Container>
-      )
+    courseService.getCoursesByProfessorId( user.id, token ).then( ( response ) => {
+      this.setState( (previousState) => {
+        previousState.token = token
+        previousState.user = user
+        previousState.datas = response.data.teacherCourses
+
+
+        //TOMAMOS POR DEFECTO EL PRIMER CURSO DEL PROFESOR, Y EMITIMOS EL EVENTO CON SU ID
+        //ENTONCES, EL FEED Y LA AGENDA DESATARAN EL EVENTO DE OBTENER LAS ACTIVIDADES Y TAREAS
+        //RESPECTIVAMENTE, SIEMPRE DEPENDIENDO DE LA ID, ENTONCES, CUANDO SE CAMBIE DE ID, SE EMITIRA
+        //NUEVAMENTE ESTE EVENTO, DE MANERA QUE, TODO SU CONETENIDO, SERA RECARGADO
+        this.changeCourseId( previousState.datas[0].id, previousState.token )
+      
+        return previousState
+      })      
+    } ).catch( ( error ) => {
+      console.log( error )
+    })
+    
+
+
+
   }
+
 
   _changeState( resp )
   {
 
     if( resp === 1)
     {
+
+      
       this.setState( previousState => {
         previousState.homeActive = true
         previousState.chatActive = false
         previousState.agendaActive = false
         previousState.profileActive = false
+        previousState.menuActive = false
         return previousState
       })
     }
@@ -155,6 +146,18 @@ export default class MainContainer extends Component {
         previousState.chatActive = false
         previousState.agendaActive = true
         previousState.profileActive = false
+        previousState.menuActive = false
+        return previousState
+      })
+    }
+    else if( resp === 4)
+    {
+      this.setState( previousState => {
+        previousState.homeActive = false
+        previousState.chatActive = false
+        previousState.agendaActive = false
+        previousState.profileActive = true
+        previousState.menuActive = false
         return previousState
       })
     }
@@ -164,18 +167,20 @@ export default class MainContainer extends Component {
         previousState.homeActive = false
         previousState.chatActive = false
         previousState.agendaActive = false
-        previousState.profileActive = true
+        previousState.profileActive = false
+        previousState.menuActive = true
         return previousState
-      })
+      })      
     }
   }
 
-
-  closeDrawer = () => {
+  closeDrawer()
+  {
     this.drawer._root.close()
   }
   
-  openDrawer = () => {
+  openDrawer()
+  {
     this.drawer._root.open()
   }
 
@@ -183,15 +188,64 @@ export default class MainContainer extends Component {
   {
     return (
       <Right>
-        <Button transparent onPress={() => this.openDrawer() }>
+        <Button transparent onPress={() => Actions.AddTask({text: {user: this.state.user, token: this.state.token, selectedCourse: this.state.selectedCourse } }) }>
           <Icon style= {{ color: "white" }} name="ios-add-outline" />
         </Button>
       </Right>
       )
   }
 
+  changeSelectedCourse( courseId )
+  {
+    this.setState( previousState => {
+      previousState.selectedCourse = courseId
+      return previousState
+    })
+  }
 
-  render() {
+  changeCourseId( id, token )
+  {
+    this.changeSelectedCourse( id )
+    this.closeDrawer()
+    EventEmitter.emit("userHasChangedCourseID", id, token )
+  }
+
+
+  _renderDrawerContent()
+  {
+    return (
+      <Container>
+        <Content bounces={false} style={ styles.drawContainerStyle }>
+          <Grid>
+            <Row >
+              <Image source={ drawerCover} style={ styles.drawerCoverStyle } />
+              <Image style={ styles.logoNameStyle } source={ drawerImage } />
+            </Row>
+            <Row>            
+              <Text> Mis Cursos </Text>
+            </Row>
+
+            <Row>
+              <List dataArray={ this.state.datas } renderRow={data => 
+                <ListItem button noBorder onPress={() => this.changeCourseId( data.id, this.state.token ) }>
+                    <Left>
+                      <Icon active name={"ios-people-outline"} style={ styles.IconStyle } />
+                      <Text style={styles.text}>
+                        {data.name}
+                      </Text>
+                    </Left>
+                </ListItem>}/>
+            </Row>
+
+          </Grid>
+        </Content>
+      </Container>
+      )
+  }
+
+
+  render() 
+  {
 
 
     return (
@@ -211,7 +265,16 @@ export default class MainContainer extends Component {
                 </Left>
 
                 <Body>
-                  <Title style={{ color: 'white' }}>Inicio</Title>
+                  { this.state.homeActive ? <Title style={{ color: 'white' }}>Inicio</Title> : null }
+
+                  { this.state.chatActive ? <Title style={{ color: 'white' }}>Chats</Title> : null }
+
+                  { this.state.profileActive ? <Title style={{ color: 'white' }}>Perfil</Title>: null }
+
+                  { this.state.agendaActive ? <Title style={{ color: 'white' }}>Agenda</Title>: null }
+
+                  { this.state.menuActive ? <Title style={{ color: 'white' }}>Menu</Title>: null }
+                  
                 </Body>
 
 
@@ -222,13 +285,15 @@ export default class MainContainer extends Component {
 
 
           <Content>
-            { this.state.homeActive ? <FeedHome /> : null }
+            { this.state.homeActive ? <FeedHome user={ this.state.user }  token={ this.state.token } selectedCourse={ this.state.selectedCourse } /> : null }
 
-            { this.state.chatActive ? <ChatHome /> : null }
+            { this.state.chatActive ? <ChatHome user={ this.state.user } token={ this.state.token } selectedCourse={ this.state.selectedCourse }/> : null }
 
-            { this.state.profileActive ? <ProfileHome />: null }
+            { this.state.profileActive ? <ProfileHome user={ this.state.user } token={ this.state.token } selectedCourse={ this.state.selectedCourse } />: null }
 
-            { this.state.agendaActive ? <AgendaHome />: null }
+            { this.state.agendaActive ? <AgendaHome user={ this.state.user } token={ this.state.token } selectedCourse={ this.state.selectedCourse }/>: null }
+
+            { this.state.menuActive ? <Menu user={ this.state.user } token={ this.state.token } selectedCourse={ this.state.selectedCourse } />: null }
           </Content>
 
           <Footer style={{ backgroundColor: 'white' }}>
@@ -248,7 +313,7 @@ export default class MainContainer extends Component {
                   direction="up"
                   containerStyle={{ }}
                   style={ styles.fabIcon }
-                  onPress={() => console.log("hola") }>
+                  onPress={() => this._changeState(5) }>
                   <Icon name="add" />
                 </Fab>
               </View>
@@ -316,7 +381,7 @@ const styles = StyleSheet.create({
         position: 'relative',
         flex: 0.95,
         justifyContent: 'center',
-        marginLeft: 45,
+        marginLeft: 30,
         top: 21,
         elevation: 8,
         width: '95%'
