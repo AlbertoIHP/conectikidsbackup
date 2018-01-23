@@ -30,30 +30,73 @@ import {
   ListItem,
   Grid,
   Row,
-  Column
+  Column,
+  Spinner
 } from "native-base"
 import { LinearGradient } from 'expo'
 
+import { socket } from '../../../../services/socket'
+import { activityService } from '../../../../services/Activity.service'
+
+
+
 class AddActivity extends Component {
 
+  //IMAGEN HARDCODEADA DEBE SUBIRSE CORRECTAMENTE
 
   constructor(props)
   {
     super(props);
-    this.state = {
-    description: '',
-    photoUrl: null,
-    type: '',
-    tags: [],
-    tagsRender: [],
-    loading: false
+    this.state ={ 
+      newActivity: {
+        name: '',
+        description: '',
+        createdBy_id : this.props.text.user.id,
+        course_id: this.props.text.selectedCourse,
+        urlPhoto: 'http://www.jardinesinfantiles.cl/chocolate/fotos/p1000321%20copy%20.jpg',
+        activityType: this.props.text.activityType
+      },
+      taggedPeople: [],
+      loading: false
     }
 
     this._publishActivity = this._publishActivity.bind(this);
     this._explore = this._explore.bind(this);
     this._openCamera = this._openCamera.bind(this);
-    this._tag = this._tag.bind(this);
   }
+
+  _publishActivity()
+  {
+    console.log("Aqui va la logica para publciar la actividad")
+
+    this.changeLoading( true )
+
+
+    activityService.store( this.state.newActivity ).then( ( response ) => {
+      console.log( response.data )
+      
+      //SE EMITE EL EVENTO
+      socket.emit('activityAdded', JSON.stringify( this.state.newActivity ))
+      this.changeLoading( false )
+      Actions.pop()
+      
+      
+    }).catch( ( error ) => {
+      console.log( error )
+      this.changeLoading( false )
+    })
+
+    // const {navigate} = this.props.navigation;
+    // if (this.state.loading){
+    //   alert("Se está cargando la foto o video");
+    //   return
+    // }
+    // let userId = Auth.user().uid;
+    // Database.publishActivity(userId, this.state).then(function(value){
+    //   navigate('Home')
+    // });
+  }
+
 
 
 
@@ -118,90 +161,75 @@ class AddActivity extends Component {
   }
 
 
-
-  _tag()
+  changeLoading( state )
   {
-  	console.log("Aqui debe ir la logica para etiquetar personas")
-    // const {navigate} = this.props.navigation;
-    // navigate('TagChildren', {returnData: this.returnData.bind(this)});
-  }
-
-  _publishActivity()
-  {
-  	console.log("Aqui va la logica para publciar la actividad")
-    // const {navigate} = this.props.navigation;
-    // if (this.state.loading){
-    //   alert("Se está cargando la foto o video");
-    //   return
-    // }
-    // let userId = Auth.user().uid;
-    // Database.publishActivity(userId, this.state).then(function(value){
-    //   navigate('Home')
-    // });
-  }
-
-
-  renderTags() 
-  {
-  	console.log("Aqui va la logica para mostrar las etiquetas ")
-    // if(this.state.tagsRender)
-    // {
-    //   return this.state.tagsRender.map(function(tags, i){
-    //     return(
-    //       <GroupTag style={styles.tag} key={tags.id} text={tags.name}/>
-    //     );
-    //   });
-    // }
-  }
-
-  onFocus()
-  {
-    this.setState({
-      description: ''
-    });
+    this.setState( previousState => {
+      previousState.loading = state
+      return previousState
+    })
   }
 
 
 
-  render () 
+  changeName( name )
   {
-    return(
-
-        <Container style={{ backgroundColor: 'white'}} >
-            <LinearGradient colors={['#fd7292', '#fd6342']} >
-              <Header style={{ backgroundColor: 'transparent' }}>
-
-                <Left>
-                  <Button transparent onPress={() => Actions.reset('MainContainer') } >
-                    <Icon style= {{ color: "white" }} name="arrow-back" />
-                  </Button>
-                </Left>
-
-                <Body>
-                  <Title style={{ color: 'white' }}> { this.props.text } </Title>
-                </Body>
-
-                <Right />
-                
-              </Header>
-            </LinearGradient>
+    this.setState( previousState => {
+      previousState.newActivity.name = name
+      return previousState 
+    })
+  }
 
 
-          <Content style={{ backgroundColor: 'white'}} >
+  changeDescription( description )
+  {
+    this.setState( previousState => {
+      previousState.newActivity.description = description
+      return previousState
+    })
+  }
+
+  tagSomeOne( someone )
+  {
+    this.setState( previousState => {
+      previousState.taggedPeople.push( someon )
+      return previousState
+    })
+  }
+
+  renderContent()
+  {
+    if( this.state.loading )
+    {
+      return (
+          <Spinner color='#fd6342' />
+        )
+    }
+    else
+    {
+      return( 
             <View style={styles.container}>
               <Image source={require('./img/activityDescription.png')}/>
               <TextInput
                 maxLength={100}
                 style={[styles.textInput]}
-                onFocus={() => this.onFocus()}
                 multiline={true}
                 numberOfLines={2}
-                onChangeText={(description) => this.setState({description})}
-                placeholder="Escribe algo"
-                value={this.state.description}/>
-                <ScrollView style={styles.containerTags} horizontal={true} showsVerticalScrollIndicator={false}>
+                onChangeText={( name ) => this.changeName( name ) }
+                placeholder="Dale un nombre a tu actividad"
+                value={this.state.newActivity.name}/>
+
+              <TextInput
+                maxLength={100}
+                style={[styles.textInput]}
+                multiline={true}
+                numberOfLines={2}
+                onChangeText={(description) => this.changeDescription( description ) }
+                placeholder="Describela para saber mas"
+                value={this.state.newActivity.description}/>
+
+{/*                <ScrollView style={styles.containerTags} horizontal={true} showsVerticalScrollIndicator={false}>
                   {this.renderTags()}
-                </ScrollView>
+                </ScrollView>*/}
 
               <Image style={styles.separator} source={require('./img/linea.png')} />
               <FlatList
@@ -222,6 +250,37 @@ class AddActivity extends Component {
                 <Image source={require('./img/publicar.png')}/>
               </TouchableOpacity>
             </View>
+        )
+    }
+  }
+
+
+  render () 
+  {
+    return(
+
+        <Container style={{ backgroundColor: 'white'}} >
+            <LinearGradient colors={['#fd7292', '#fd6342']} >
+              <Header style={{ backgroundColor: 'transparent' }}>
+
+                <Left>
+                  <Button transparent onPress={() => Actions.pop() } >
+                    <Icon style= {{ color: "white" }} name="arrow-back" />
+                  </Button>
+                </Left>
+
+                <Body>
+                  <Title style={{ color: 'white' }}> { this.props.text.activityType } </Title>
+                </Body>
+
+                <Right />
+                
+              </Header>
+            </LinearGradient>
+
+
+          <Content style={{ backgroundColor: 'white'}} >
+            { this.renderContent() }
           </Content>
         </Container>
     )

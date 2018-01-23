@@ -35,7 +35,7 @@ class Menu extends Component {
   _onPressButton( text )
   {
     console.log(text)
-    Actions.AddActivity({ text: text })
+    Actions.AddActivity({ text: {user: this.props.user, selectedCourse: this.props.selectedCourse, token: this.props.token, activityType: text } })
   }
 
 

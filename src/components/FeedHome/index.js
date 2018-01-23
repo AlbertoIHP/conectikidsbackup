@@ -29,6 +29,7 @@ import {
 //import Post from './Post'
 import CalendarPicker from './CalendarPicker'
 import { activityService } from '../../services/Activity.service'
+import { socket } from '../../services/socket'
 
 const dim = Dimensions.get('window');
 
@@ -75,6 +76,22 @@ class FeedHome extends Component {
     {
       this.refreshActivities( this.props.selectedCourse, this.props.token )
     }
+
+
+    socket.on('activityAdded', ( activity ) => {
+      activity = JSON.parse( activity )
+      console.log("ESCUCHE EL EVENTO DE AÑADIR ACTIVIDAD")
+      if( activity.course_id === this.props.selectedCourse )
+      {
+        this.refreshActivities( this.props.selectedCourse, this.props.token )
+      }
+      else
+      {
+        console.log("Lo escuche, pero no tengo nada que ver con esa actividad, soy otro curos")
+      }
+
+    })
+
 
     EventEmitter.on("userHasChangedCourseID", ( idCourse, token ) => {
       //AQUI SE DEBE DE HACER EL FETCH PARA OBTENER TODAS LAS HISTORIAS DE LA ID DEL CURSO ENTREGADA
