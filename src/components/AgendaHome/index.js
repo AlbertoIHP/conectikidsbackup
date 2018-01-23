@@ -5,6 +5,7 @@ import { taskService } from '../../services/Task.service'
 import { Agenda } from 'react-native-calendars'
 import { LocaleConfig } from 'react-native-calendars'
 import Modal from 'react-native-modal'
+import { Spinner } from 'native-base'
 LocaleConfig.locales['es'] = {
   monthNames: ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
   'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
@@ -27,35 +28,59 @@ class AgendaHome extends Component {
       currentNameTask: '',
       currentDescriptionTask: '',
       currentTimeOfTask: '',
-      tasks: []
+      tasks: [],
+      showAgenda: false
     }
     this.addItem = this.addItem.bind(this)
-    this.refreshTasks()
   }
 
-
-  componentDidMount()
+  refreshTasks( idCourse, token )
   {
+      this.setState( previousState => {
+        previousState.showAgenda = false
+        previousState.items = {}
+        return previousState
+      })
 
-    EventEmitter.on("userHasChangedCourseID", ( idCourse, token ) => {
-      //AQUI SE DEBE DE HACER EL FETCH PARA OBTENER TODAS LAS TAREAS DE LA ID DEL CURSO ENTREGADA
-      console.log(token)
-      console.log(idCourse)
-      console.log("ESCUCHE EL EVENTO ACUTALIZANDO CONTENIDO A LA ID DEL CURSO")
+
       taskService.getTasksByCourseId( idCourse, token ).then( ( response ) => {
-        this.changeTasks( response.data.coursetasks )
+        this.changeTasks( response.data.courseTasks )
       }).catch( ( error ) => {
         console.log( error )
       })
 
+  }
+
+  componentDidMount()
+  {
+
+    if( this.props.selectedCourse && this.props.token )
+    {
+      this.refreshTasks( this.props.selectedCourse, this.props.token )
+    }
+
+    EventEmitter.on("userHasChangedCourseID", ( idCourse, token ) => {
+      //AQUI SE DEBE DE HACER EL FETCH PARA OBTENER TODAS LAS TAREAS DE LA ID DEL CURSO ENTREGADA
+
+
+      this.refreshTasks( idCourse, token )
     })
   }
+
 
 
   changeTasks( tasks )
   {
     this.setState( previousState => {
       previousState.tasks = tasks
+
+      for( let task of tasks )
+      {
+        this.addItem(task)
+      }
+
+      console.log("debug linea 65 AgendaHome -> index.js")
+      previousState.showAgenda = true
       return previousState
     })
   }
@@ -81,19 +106,6 @@ class AgendaHome extends Component {
     }
   }
 
-
-  createItem(d)
-  {
-    it={'2017-12-05': [{name: 'item 1 - any js object'},{name: 'any js object'}]};
-    return it;
-  }
-
-
-  refreshTasks()
-  {
-
-    this.state.items={}
-  }
 
   loadItems(day) 
   {
@@ -207,15 +219,21 @@ class AgendaHome extends Component {
   }
 
 
-
-  render() 
+  toObject( arr )
   {
-    return (
-      <View>
-        <View style={styles.container}>
+     var rv = {};
+    for (var i = 0; i < arr.length; ++i)
+      rv[i] = arr[i];
+    return rv;   
+  }
 
 
+  _renderAgenda()
+  {
 
+    if( this.state.showAgenda )
+    {
+      return (
           <Agenda
             items={this.state.items}
             loadItemsForMonth={this.loadItems.bind(this)}
@@ -224,7 +242,25 @@ class AgendaHome extends Component {
             renderItem={this.renderItem.bind(this)}
             renderEmptyDate={this.renderEmptyDate.bind(this)}
             rowHasChanged={this.rowHasChanged.bind(this)}
-            hideKnob={ false }/>        
+            hideKnob={ false }/>    
+
+        )
+    }
+    else
+    {
+      return(
+        <Spinner color='#fd6342' />
+        )
+    }
+
+  }
+
+  render() 
+  {
+    return (
+      <View>
+        <View style={styles.container}>
+            { this._renderAgenda() }    
         </View>
 
         <View>
@@ -304,7 +340,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     backgroundColor: 'rgba(0,0,0,0)',
     color: 'white',
-    fontFamily: 'helvetica',
     justifyContent: 'center',
     marginTop: 5
   }

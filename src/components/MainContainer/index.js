@@ -291,7 +291,7 @@ export default class MainContainer extends Component {
 
             { this.state.profileActive ? <ProfileHome />: null }
 
-            { this.state.agendaActive ? <AgendaHome selectedCourse={ this.state.selectedCourse }/>: null }
+            { this.state.agendaActive ? <AgendaHome token={ this.state.token } selectedCourse={ this.state.selectedCourse }/>: null }
 
             { this.state.menuActive ? <Menu />: null }
           </Content>

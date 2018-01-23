@@ -79,7 +79,7 @@ class TaskService {
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
 
-		return http.get('tasks/getcoursebyuser/'+id)
+		return http.get('tasks/gettasksbycourseid/'+id)
 			
 
 	}
