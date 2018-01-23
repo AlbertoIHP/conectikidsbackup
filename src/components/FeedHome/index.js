@@ -29,7 +29,6 @@ import {
 import Post from './Post';
 import CalendarPicker from './CalendarPicker'
 import { activityService } from '../../services/Activity.service'
-import { socket } from '../../services/socket'
 import moment from 'moment';
 
 const dim = Dimensions.get('window');
@@ -78,7 +77,7 @@ class FeedHome extends Component {
       this.refreshActivities( this.props.selectedCourse, this.props.token, moment(new Date()).format('YYYY-MM-DD'))
     }
 
-    EventEmitter.on("userHasChangedCourseID", ( idCourse, token ) => {
+    EventEmitter.on("userHasChangedCourseID", ( idCourse, token, date ) => {
       //AQUI SE DEBE DE HACER EL FETCH PARA OBTENER TODAS LAS HISTORIAS DE LA ID DEL CURSO ENTREGADA
       this.refreshActivities( idCourse, token, moment(new Date()).format('YYYY-MM-DD'))
 

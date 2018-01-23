@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {TextArea, StyleSheet, View, Text, TouchableOpacity, Modal } from 'react-native';
+import {TextArea, StyleSheet, View, Text, TouchableOpacity, Modal, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import VideoPlayer from 'react-native-video-player';
 import EvilIcon from 'react-native-vector-icons/EvilIcons';
@@ -47,7 +47,7 @@ class Post extends React.Component {
         //     //some headers ..
         //   })
         //   .then((res) => {
-        //     // the temp file path with file extension `png`
+        //     // the temp file path with file extension png
         //     // Beware that when using a file path as Image source on Android,
         //     // you must prepend "file://"" before the file path
         //     me.setState({
@@ -177,12 +177,15 @@ Post.defaultProps = {
 const styles = StyleSheet.create({
   parentContainer: {
 		borderRadius: 10,
-		elevation: 2,
+		...Platform.select({
+			ios: {zIndex: 2},
+			android: { elevation: 2}
+		}),
 		marginLeft: 5,
 		marginRight: 5,
 		marginTop: 10,
 		marginBottom: 10,
-  	flexDirection:'row'
+  		flexDirection:'row'
   },
   container: {
     flex: 8,
