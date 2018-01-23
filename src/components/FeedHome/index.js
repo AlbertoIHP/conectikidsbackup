@@ -55,20 +55,30 @@ class FeedHome extends Component {
     }
     this.getActivities(today)
 
+
+  }
+
+  refreshActivities( idCourse, token )
+  {
+      activityService.getActivitiesByCourseId( idCourse, token ).then( ( response ) => {
+        this.changeActivities( response.data.courseActivities )
+      }).catch( ( error ) => {
+        console.log( error )
+      })
   }
 
 
   componentDidMount()
   {
 
+    if( this.props.selectedCourse && this.props.token )
+    {
+      this.refreshActivities( this.props.selectedCourse, this.props.token )
+    }
+
     EventEmitter.on("userHasChangedCourseID", ( idCourse, token ) => {
       //AQUI SE DEBE DE HACER EL FETCH PARA OBTENER TODAS LAS HISTORIAS DE LA ID DEL CURSO ENTREGADA
-      console.log("ESCUCHE EL EVENTO ACUTALIZANDO CONTENIDO A LA ID DEL CURSO")
-      activityService.getActivitiesByCourseId( idCourse, token ).then( ( response ) => {
-        this.changeActivities( response.data.courseActivities )
-      }).catch( ( error ) => {
-        console.log( error )
-      })
+      this.refreshActivities( idCourse, token )
 
     })
   }
@@ -77,7 +87,7 @@ class FeedHome extends Component {
   {
     this.setState( previousState => {
       previousState.activities = activities
-      console.log( "Las actividades son:  (DEBUG: LINEA 47 FEEDHOME->Index.js)")
+      console.log(activities)
       return previousState
     })
   }
@@ -169,9 +179,6 @@ class FeedHome extends Component {
         )
     }
 
-    console.log( this.state.activites )
-
-
     return(
         <List dataArray={ this.state.activities } renderRow={data => 
           <ListItem button noBorder onPress={() => console.log(data.name) }>
@@ -188,7 +195,7 @@ class FeedHome extends Component {
   render()
   {
 
-    console.log("HOLAAAAAAAAAAAAAA")
+    
     if(this.state.loading){
       return(
         <CustomSpinner/>

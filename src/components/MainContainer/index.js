@@ -285,7 +285,7 @@ export default class MainContainer extends Component {
 
 
           <Content>
-            { this.state.homeActive ? <FeedHome selectedCourse={ this.state.selectedCourse } /> : null }
+            { this.state.homeActive ? <FeedHome token={ this.state.token } selectedCourse={ this.state.selectedCourse } /> : null }
 
             { this.state.chatActive ? <ChatHome /> : null }
 
