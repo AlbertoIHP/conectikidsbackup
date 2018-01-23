@@ -23,7 +23,7 @@ class ActivityService {
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
 		return http.get('activities/'+id)
-			
+
 
 	}
 
@@ -46,7 +46,7 @@ class ActivityService {
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
 		return http.delete('activities/'+id)
-			
+
 
 	}
 
@@ -74,6 +74,15 @@ class ActivityService {
 
 
 		return http.get('activities/getCourseActivities/'+id)
+
+	}
+
+	getActivitiesByCourseIdAndDate(id, token, date) {
+		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token }
+		let http = axios.create({ baseURL: base.api,  headers: headers	})
+		url = 'activities/getactivitiesbydate/'+id+'&'+date
+		return http.get(url)
+
 
 	}
 

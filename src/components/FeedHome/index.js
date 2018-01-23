@@ -26,10 +26,11 @@ import {
   Column
 } from "native-base"
 
-//import Post from './Post'
+import Post from './Post';
 import CalendarPicker from './CalendarPicker'
 import { activityService } from '../../services/Activity.service'
 import { socket } from '../../services/socket'
+import moment from 'moment';
 
 const dim = Dimensions.get('window');
 
@@ -48,7 +49,7 @@ class FeedHome extends Component {
     selected = activities[today.getTime()]
 
     this.state = {
-      activities: activities,
+      activities: [],
       selectedActivities: selected,
       selectedDate: today,
       modalVisible: true,
@@ -59,10 +60,10 @@ class FeedHome extends Component {
 
   }
 
-  refreshActivities( idCourse, token )
+  refreshActivities( idCourse, token, date )
   {
-      activityService.getActivitiesByCourseId( idCourse, token ).then( ( response ) => {
-        this.changeActivities( response.data.courseActivities )
+      activityService.getActivitiesByCourseIdAndDate( idCourse, token, date ).then( ( response ) => {
+        this.changeActivities( response.data.fileteredActivities )
       }).catch( ( error ) => {
         console.log( error )
       })
@@ -74,28 +75,12 @@ class FeedHome extends Component {
 
     if( this.props.selectedCourse && this.props.token )
     {
-      this.refreshActivities( this.props.selectedCourse, this.props.token )
+      this.refreshActivities( this.props.selectedCourse, this.props.token, moment(new Date()).format('YYYY-MM-DD'))
     }
-
-
-    socket.on('activityAdded', ( activity ) => {
-      activity = JSON.parse( activity )
-      console.log("ESCUCHE EL EVENTO DE AÑADIR ACTIVIDAD")
-      if( activity.course_id === this.props.selectedCourse )
-      {
-        this.refreshActivities( this.props.selectedCourse, this.props.token )
-      }
-      else
-      {
-        console.log("Lo escuche, pero no tengo nada que ver con esa actividad, soy otro curos")
-      }
-
-    })
-
 
     EventEmitter.on("userHasChangedCourseID", ( idCourse, token ) => {
       //AQUI SE DEBE DE HACER EL FETCH PARA OBTENER TODAS LAS HISTORIAS DE LA ID DEL CURSO ENTREGADA
-      this.refreshActivities( idCourse, token )
+      this.refreshActivities( idCourse, token, moment(new Date()).format('YYYY-MM-DD'))
 
     })
   }
@@ -104,7 +89,6 @@ class FeedHome extends Component {
   {
     this.setState( previousState => {
       previousState.activities = activities
-      console.log(activities)
       return previousState
     })
   }
@@ -131,40 +115,10 @@ class FeedHome extends Component {
 
   _onDateChange(date)
   {
-    this.setState({
-      loading: true,
-    })
-    newDate =  this.getStartDay(date)
-    select = this.state.activities[newDate.getTime()]
-    if (!select)
-    {
-      activities = this.state.activities
-      activities[newDate.getTime()] = []
-      this.setState({
-        activities: activities,
-        loading:false,
-      },
-        () =>{
-          select = this.state.activities[newDate.getTime()]
-          this.setState({
-            loading: false,
-            selectedDate: newDate,
-            selectedActivities: select,
-          }, () => this.getActivities(newDate))
-        }
-      )
-    } 
-    else 
-    {
-      this.setState({
-        selectedDate: newDate,
-        selectedActivities: select,
-        loading: false,
-      })
-    }
+    this.refreshActivities( this.props.selectedCourse, this.props.token, moment(date).format('YYYY-MM-DD'))
   }
 
-  setModalVisible(visible) 
+  setModalVisible(visible)
   {
     this.setState( { modalVisible: visible } );
   }
@@ -192,18 +146,16 @@ class FeedHome extends Component {
     if( this.state.activities.length <= 0 )
     {
       return (
-        <Text> No hay actividades que mostrar</Text>
+          <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, }}>
+            <Text> No hay actividades para mostrar </Text>
+          </View>
         )
     }
 
     return(
-        <List dataArray={ this.state.activities } renderRow={data => 
+        <List dataArray={ this.state.activities } renderRow={data =>
           <ListItem button noBorder onPress={() => console.log(data.name) }>
-           <Left>
-             <Text>
-               {data.name}
-              </Text>
-                    </Left>
+            <Post activity={data} />
         </ListItem>}/>
       )
 
@@ -212,7 +164,7 @@ class FeedHome extends Component {
   render()
   {
 
-    
+
     if(this.state.loading){
       return(
         <CustomSpinner/>
