@@ -3,83 +3,67 @@ import { socket } from './socket'
 import axios from 'axios'
 
 
+class TagService {
 
-class ChildrenService {
-
-	index ( token )
+	index( token )
 	{
 
 		let headers = { 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		return http.get('childrens')
-			
+		return http.get('tags')
 
 	}
 
-	show ( id, token )
+	show( id, token )
 	{
 		let headers = { 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		return http.get('childrens/'+id)
-			
+		return http.get('tags/'+id)
+
 
 	}
 
-	update ( id, children, token )
+	update( id, tag, token )
 	{
 
 		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		return http.put('childrens/'+id, children)
-			
+
+		return http.put('tags/'+id,  tag)
 
 	}
 
-	destroy ( id, token )
+	destroy( id, token )
 	{
 		let headers = { 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
+		return http.delete('tags/'+id)
 
-		return http.delete('childrens/'+id)
-			
 
 	}
 
 
-	store ( children )
+	store( tag )
 	{
 
 		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json' }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-		children.access_token = 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP'
+		tag.access_token = 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP'
 
-
-		return http.post( 'childrens', JSON.stringify( children ) )
+		return http.post( 'tags', JSON.stringify( tag ) )
 	}
-
-	getParentsCourse(id, token) {
-		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token }
-		let http = axios.create({ baseURL: base.api,  headers: headers	})
-		url = 'childrens/getchildrensparentbycourseid/'+id
-		return http.get(url)
-
-
-	}
-
 
 
 }
 
-
-export const childrenService = new ChildrenService();
-
+export const tagService = new TagService();

@@ -7,7 +7,6 @@ import AddTask from '../components/AgendaHome/AddTask'
 import AddActivity from '../components/Menu/AddActivity'
 import Comments from '../components/FeedHome/Post/comments'
 
-
 const RouterComponent = () => {
     return (
       <Router hideNavBar="true">
