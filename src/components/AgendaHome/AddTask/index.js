@@ -40,7 +40,7 @@ import {
 import { taskService } from '../../../services/Task.service'
 
 import { socket } from '../../../services/socket'
-
+import Modal from 'react-native-modal'
 class AddTask extends Component {
 
 
@@ -58,7 +58,8 @@ class AddTask extends Component {
         course_id: this.props.text.selectedCourse,
         createdBy_id: this.props.text.user.id
       },
-      loading: false
+      loading: false,
+      isModalVisible: false
     }
 
     console.log("DEBUGGING AGENDAHOME")
@@ -150,6 +151,7 @@ class AddTask extends Component {
     if( this.state.newTask.name === '' || this.state.newTask.description === '')
     {
       console.log("Deben llenarse los campos")
+      this.changeModal( true )
     }
     else
     {
@@ -214,6 +216,13 @@ class AddTask extends Component {
   }
 
 
+  changeModal( state )
+  {
+    this.setState( previousState => {
+      previousState.isModalVisible = state
+      return previousState
+    })
+  }
 
 
 
@@ -344,7 +353,47 @@ class AddTask extends Component {
 
           <Content style={{ backgroundColor: 'white'}} >
             { this.renderContent() }
+              <View>
+
+                  <Modal 
+                  isVisible={ this.state.isModalVisible }
+                  onBackdropPress={() => this.setState({ isModalVisible: false })}>
+                    <Container style={{ flex: 0.3, borderRadius: 40 }}>
+
+                    <LinearGradient colors={['#fd7292', '#fd6342']} >
+                      <Header style={{ backgroundColor: 'transparent' }}>
+
+                        <Left>
+                        </Left>
+
+                        <Body>
+                          <Title style={{ color: 'white' }}> Error </Title>
+                        </Body>
+    
+                        <Right>
+                        </Right>                    
+                      </Header>
+                    </LinearGradient>
+
+                      <Content contentContainerStyle={{ borderRadius: 3, backgroundColor: 'white', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <Text>
+                          ¡ Recuerda rellenar todos los campos necesarios !
+                        </Text>
+
+                          <TouchableOpacity style={styles.touchable} onPress={() => this.setState({ isModalVisible: false })}>
+                            <LinearGradient colors={['#fd7292', '#fd6342']} style={styles.gradient} >
+                              <Text style={styles.buttonText} >
+                                 Cerrar
+                              </Text>
+                            </LinearGradient>
+                          </TouchableOpacity>
+
+                      </Content>
+                    </Container>
+                  </Modal>
+              </View>
           </Content>
+
         </Container>
     )
 
@@ -450,6 +499,35 @@ export const styles = StyleSheet.create({
     height: 80,
     color: '#35405260',
     borderColor: 'gray',
+  },
+  touchable: 
+  {
+    marginTop: 20,
+    marginLeft: 20,
+    marginRight: 20,
+    marginBottom: 5,
+    height: '30%',
+    width: '70%'
+  },
+  gradient: {
+    flex: 1,
+    padding: 5,
+    borderRadius: 5,
+    ...Platform.select({
+      ios: { zIndex: 2 },
+      android: { elevation: 2 }
+    }),
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    fontSize: 20
   }
 });
 

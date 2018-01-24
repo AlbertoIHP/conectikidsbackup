@@ -1,11 +1,32 @@
 import React, {Component} from 'react';
-import { View, Text, StyleSheet, Button, Image, TouchableHighlight, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Button, Image, TouchableHighlight, TouchableOpacity, Platform } from 'react-native'
 import EventEmitter from "react-native-eventemitter"
 import { taskService } from '../../services/Task.service'
 import { Agenda } from 'react-native-calendars'
 import { LocaleConfig } from 'react-native-calendars'
 import Modal from 'react-native-modal'
-import { Spinner } from 'native-base'
+import { LinearGradient } from 'expo' 
+import {
+  Container,
+  Icon,
+  Header,
+  Title,
+  Content,
+  Footer,
+  FooterTab,
+  Body,
+  Left,
+  Right,
+  Fab,
+  Drawer,
+  List,
+  Badge,
+  ListItem,
+  Grid,
+  Row,
+  Column,
+  Spinner
+} from "native-base"
 LocaleConfig.locales['es'] = {
   monthNames: ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
   'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
@@ -279,44 +300,42 @@ class AgendaHome extends Component {
             <Modal 
             isVisible={ this.state.isModalVisible }
             onBackdropPress={() => this.setState({ isModalVisible: false })}>
-              <View style={{ flex: 0.4, backgroundColor: 'white', borderRadius: 10,justifyContent: 'space-between' }}>
-                <View style={{ flex: 1 }}  >
 
 
-                  <View style={{ flex: 1 }} >
-                    <TouchableOpacity style={{ flex: 1 }}>
-                      <View style={{ flex: 1 }}>
-                        <Image
-                          style={{ position: 'absolute', borderRadius: 5, top: 0.2, width: '100%' }}
-                          source={require('./img/info.png') }/>
-                        <Text style={ styles.headline } > { this.state.currentNameTask } </Text>
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-
-                  <View style={{ flex: 2, justifyContent: 'center' }}>
-                    <Text style={{ textAlign: 'center', justifyContent: 'center', }} >Descripción: { this.state.currentDescriptionTask }</Text>
-                  </View>
 
 
-                  <View style={{ flex: 1 }} >
-                    <TouchableOpacity style={{ flex: 1 }}>
-                      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                        <Image
-                          style={{ position: 'absolute', height: '70%', width: '60%',  }}
-                          source={require('./img/time.png') }/>
+                    <Container style={{ flex: 0.3, borderRadius: 40 }}>
 
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                          <Text>Hora: { this.state.currentTimeOfTask } </Text>
-                        </View>
-                        
-                      </View>
-                    </TouchableOpacity>
-                  </View>
+                    <LinearGradient colors={['#fd7292', '#fd6342']} >
+                      <Header style={{ backgroundColor: 'transparent' }}>
 
+                        <Left>
+                        </Left>
 
-                </View>
-              </View>
+                        <Body>
+                          <Title style={{ color: 'white' }}> { this.state.currentNameTask } </Title>
+                        </Body>
+    
+                        <Right>
+                        </Right>                    
+                      </Header>
+                    </LinearGradient>
+
+                      <Content contentContainerStyle={{ borderRadius: 3, backgroundColor: 'white', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <Text>
+                          Descripción: { this.state.currentDescriptionTask }
+                        </Text>
+
+                          <TouchableOpacity style={styles.touchable} onPress={() => this.setState({ isModalVisible: false })}>
+                            <LinearGradient colors={['#fd7292', '#fd6342']} style={styles.gradient} >
+                              <Text style={styles.buttonText} >
+                                 Hora: { this.state.currentTimeOfTask }
+                              </Text>
+                            </LinearGradient>
+                          </TouchableOpacity>
+
+                      </Content>
+                    </Container>
             </Modal>
         </View>
 
@@ -353,6 +372,37 @@ const styles = StyleSheet.create({
     color: 'white',
     justifyContent: 'center',
     marginTop: 5
+  },
+  touchable: 
+  {
+    marginTop: 20,
+    marginLeft: 20,
+    marginRight: 20,
+    marginBottom: 5,
+    height: '30%',
+    width: '70%'
+  },
+  gradient: 
+  {
+    flex: 1,
+    padding: 5,
+    borderRadius: 5,
+    ...Platform.select({
+      ios: { zIndex: 2 },
+      android: { elevation: 2 }
+    }),
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  buttonText: 
+  {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    fontSize: 20
   }
 })
 

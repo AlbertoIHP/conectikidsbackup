@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  CameraRoll
+  CameraRoll,
+  Platform
 } from 'react-native'
 import { Actions } from 'react-native-router-flux'
 import {
@@ -259,18 +260,38 @@ class AddActivity extends Component {
                   <Modal 
                   isVisible={ this.state.isModalVisible }
                   onBackdropPress={() => this.setState({ isModalVisible: false })}>
-                    <View style={{ flex: 0.4, backgroundColor: 'white', borderRadius: 10,justifyContent: 'space-between' }}>
-                      <View style={{ flex: 1 }}  >
+                    <Container style={{ flex: 0.3, borderRadius: 40 }}>
 
+                    <LinearGradient colors={['#fd7292', '#fd6342']} >
+                      <Header style={{ backgroundColor: 'transparent' }}>
 
-                        <View>
+                        <Left>
+                        </Left>
 
-                          <Text> Hola ! </Text>
-                        </View>   
+                        <Body>
+                          <Title style={{ color: 'white' }}> Error </Title>
+                        </Body>
+    
+                        <Right>
+                        </Right>                    
+                      </Header>
+                    </LinearGradient>
 
+                      <Content contentContainerStyle={{ borderRadius: 3, backgroundColor: 'white', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <Text>
+                          ¡ Recuerda rellenar todos los campos necesarios !
+                        </Text>
 
-                      </View>
-                    </View>
+                          <TouchableOpacity style={styles.touchable} onPress={() => this.setState({ isModalVisible: false })}>
+                            <LinearGradient colors={['#fd7292', '#fd6342']} style={styles.gradient} >
+                              <Text style={styles.buttonText} >
+                                 Cerrar
+                              </Text>
+                            </LinearGradient>
+                          </TouchableOpacity>
+
+                      </Content>
+                    </Container>
                   </Modal>
               </View>
 
@@ -356,6 +377,35 @@ const styles = StyleSheet.create({
     height: 80,
     color: '#35405260',
     borderColor: 'gray',
+  },
+  touchable: 
+  {
+    marginTop: 20,
+    marginLeft: 20,
+    marginRight: 20,
+    marginBottom: 5,
+    height: '30%',
+    width: '70%'
+  },
+  gradient: {
+    flex: 1,
+    padding: 5,
+    borderRadius: 5,
+    ...Platform.select({
+      ios: { zIndex: 2 },
+      android: { elevation: 2 }
+    }),
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    fontSize: 20
   }
 })
 
