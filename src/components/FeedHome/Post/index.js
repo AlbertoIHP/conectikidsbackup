@@ -91,7 +91,7 @@ class Post extends React.Component {
 
     _openComments() {
 			// console.log(this.state.comments);
-			Actions.Comments({ comments: this.state.comments })
+			Actions.Comments({ comments: this.state.comments, activityId: this.props.activity.id })
     }
 
 	render(){
@@ -185,6 +185,7 @@ class Post extends React.Component {
                             commentsVisible: false
                         })}
                             comments={this.state.comments}
+														activityId={this.props.activity.id}
                         />
                     </Modal>
                 }

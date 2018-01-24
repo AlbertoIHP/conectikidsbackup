@@ -38,6 +38,8 @@ import {
 } from "native-base"
 import { LinearGradient } from 'expo'
 import Comment from './components/comment';
+import Modal from 'react-native-modal'
+
 
 import { commentService } from '../../../../services/Comment.service'
 import { storage } from '../../../../services/localStorage.service'
@@ -50,24 +52,40 @@ class Comments extends React.Component {
         let params = props.navigation.state.params;
         this._onSend = this._onSend.bind(this)
         this.state = {
-          comments: this.props.comments,
+          comments: [],
           msg: '',
           user: [],
-          activityId: this.props.comments[0].activity_id
+          activityId: this.props.activityId,
+          isModalVisible: false
         }
     }
 
     async componentWillMount() {
       let user =  await storage.getItem( 'currentUser' );
       this.changeUser(user);
+        if (this.props.comments.length < 0 ){
+          this.changeState()
+        }
     }
-
+    changeState() {
+      this.setState( previousState => {
+        previousState.comments = this.props.comments;
+        return previousState
+      })
+    }
+    changeModal( state )
+    {
+      this.setState( previousState => {
+        previousState.isModalVisible = state
+        return previousState
+      })
+    }
     _onSend() {
       if(this.state.msg == ''){
-        console.log('modal error');
+        this.changeModal( true )
       }else {
         commentService.store(this.state.msg, this.state.user.id, this.state.activityId)
-        .then((response) => console.log(response))
+        .then((response) => Actions.pop())
         .catch((error) => console.log(error));
       }
     }
@@ -87,11 +105,13 @@ class Comments extends React.Component {
       })
     }
     renderContent() {
-      Object.values(this.state.comments).map((prop, key) => {
+      if (this.state.comments.length > 0 ){
+        Object.values(this.state.comments).map((prop, key) => {
           return (
-              <Comment info={prop.createdBy_id} text={prop.content} />
+            <Comment info={prop.createdBy_id} text={prop.content} />
           );
-      });
+        });
+      }
     }
 
     render() {
@@ -117,16 +137,46 @@ class Comments extends React.Component {
 
 
             <Content style={{ backgroundColor: 'white', paddingTop: 10}} >
+              <Modal
+              isVisible={ this.state.isModalVisible }
+              onBackdropPress={() => this.setState({ isModalVisible: false })}>
+                <Container style={{ flex: 0.3, borderRadius: 40 }}>
+
+                <LinearGradient colors={['#fd7292', '#fd6342']} >
+                  <Header style={{ backgroundColor: 'transparent' }}>
+
+                    <Left>
+                    </Left>
+
+                    <Body>
+                      <Title style={{ color: 'white' }}> Error </Title>
+                    </Body>
+
+                    <Right>
+                    </Right>
+                  </Header>
+                </LinearGradient>
+
+                  <Content contentContainerStyle={{ borderRadius: 3, backgroundColor: 'white', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <Text>
+                      ¡ Recuerda rellenar todos los campos necesarios !
+                    </Text>
+
+                      <TouchableOpacity style={styles.touchable} onPress={() => this.setState({ isModalVisible: false })}>
+                        <LinearGradient colors={['#fd7292', '#fd6342']} style={styles.gradient} >
+                          <Text style={styles.buttonText} >
+                             Cerrar
+                          </Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
+
+                  </Content>
+                </Container>
+              </Modal>
               {
-                this.state.comments &&
-                Object.values(this.state.comments).map((prop, key) => {
-                    return (
-                        <Comment info={prop.createdBy_id} text={prop.content} />
 
-                    );
-                })
-
-               }
+                this.renderContent()
+              }
                <Footer style={{ backgroundColor: 'transparent'}}>
                <Item rounded style={{ flex: 1 }}>
                 <Input
