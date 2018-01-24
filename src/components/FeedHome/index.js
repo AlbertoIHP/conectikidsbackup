@@ -30,6 +30,8 @@ import Post from './Post';
 import CalendarPicker from './CalendarPicker'
 import { activityService } from '../../services/Activity.service'
 import moment from 'moment';
+import { socket } from '../../services/socket'
+
 
 const dim = Dimensions.get('window');
 
@@ -76,6 +78,22 @@ class FeedHome extends Component {
     {
       this.refreshActivities( this.props.selectedCourse, this.props.token, moment(new Date()).format('YYYY-MM-DD'))
     }
+
+
+    socket.on('activityAdded', ( activity ) => {
+      activity = JSON.parse(activity)
+
+      if( this.props.selectedCourse === activity.course_id )
+      {
+      this.refreshActivities( this.props.selectedCourse, this.props.token, moment(new Date()).format('YYYY-MM-DD'))
+      }
+      else
+      {
+        console.log("ESCUCHE EL EVENTO, PERO NO TENGO NADA QUE VER CON ESE CURSO")
+      }
+
+
+    })
 
     EventEmitter.on("userHasChangedCourseID", ( idCourse, token, date ) => {
       //AQUI SE DEBE DE HACER EL FETCH PARA OBTENER TODAS LAS HISTORIAS DE LA ID DEL CURSO ENTREGADA

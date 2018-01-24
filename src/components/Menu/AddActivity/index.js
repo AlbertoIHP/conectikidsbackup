@@ -35,9 +35,9 @@ import {
 } from "native-base"
 import { LinearGradient } from 'expo'
 
-import { socket } from '../../../../services/socket'
-import { activityService } from '../../../../services/Activity.service'
-
+import { socket } from '../../../services/socket'
+import { activityService } from '../../../services/Activity.service'
+import Modal from 'react-native-modal'
 
 
 class AddActivity extends Component {
@@ -57,7 +57,8 @@ class AddActivity extends Component {
         activityType: this.props.text.activityType
       },
       taggedPeople: [],
-      loading: false
+      loading: false,
+      isModalVisible: false
     }
 
     this._publishActivity = this._publishActivity.bind(this);
@@ -67,37 +68,41 @@ class AddActivity extends Component {
 
   _publishActivity()
   {
-    console.log("Aqui va la logica para publciar la actividad")
 
-    this.changeLoading( true )
+    if( this.state.newActivity.name === '' || this.state.newActivity.description === '' )
+    {
+      this.changeModal( true )
+    }
+    else
+    {
+
+      this.changeLoading( true )
 
 
-    activityService.store( this.state.newActivity ).then( ( response ) => {
-      console.log( response.data )
-      
-      //SE EMITE EL EVENTO
-      socket.emit('activityAdded', JSON.stringify( this.state.newActivity ))
-      this.changeLoading( false )
-      Actions.pop()
-      
-      
-    }).catch( ( error ) => {
-      console.log( error )
-      this.changeLoading( false )
-    })
+      activityService.store( this.state.newActivity ).then( ( response ) => {
 
-    // const {navigate} = this.props.navigation;
-    // if (this.state.loading){
-    //   alert("Se está cargando la foto o video");
-    //   return
-    // }
-    // let userId = Auth.user().uid;
-    // Database.publishActivity(userId, this.state).then(function(value){
-    //   navigate('Home')
-    // });
+        socket.emit('activityAdded', JSON.stringify( this.state.newActivity ))
+        this.changeLoading( false )
+        Actions.pop()
+        
+        
+      }).catch( ( error ) => {
+        console.log( error )
+        this.changeLoading( false )
+      })      
+    }
+
+
   }
 
 
+  changeModal( state )
+  {
+    this.setState( previousState => {
+      previousState.isModalVisible = state
+      return previousState
+    })
+  }
 
 
   returnData(childrens) 
@@ -227,9 +232,6 @@ class AddActivity extends Component {
                 placeholder="Describela para saber mas"
                 value={this.state.newActivity.description}/>
 
-{/*                <ScrollView style={styles.containerTags} horizontal={true} showsVerticalScrollIndicator={false}>
-                  {this.renderTags()}
-                </ScrollView>*/}
 
               <Image style={styles.separator} source={require('./img/linea.png')} />
               <FlatList
@@ -249,6 +251,30 @@ class AddActivity extends Component {
               <TouchableOpacity onPress={this._publishActivity} style={styles.button}>
                 <Image source={require('./img/publicar.png')}/>
               </TouchableOpacity>
+
+
+
+              <View>
+
+                  <Modal 
+                  isVisible={ this.state.isModalVisible }
+                  onBackdropPress={() => this.setState({ isModalVisible: false })}>
+                    <View style={{ flex: 0.4, backgroundColor: 'white', borderRadius: 10,justifyContent: 'space-between' }}>
+                      <View style={{ flex: 1 }}  >
+
+
+                        <View>
+
+                          <Text> Hola ! </Text>
+                        </View>   
+
+
+                      </View>
+                    </View>
+                  </Modal>
+              </View>
+
+
             </View>
         )
     }

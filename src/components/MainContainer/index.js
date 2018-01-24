@@ -48,7 +48,7 @@ import ProfileHome from '../ProfileHome'
 
 import ChatHome from '../ChatHome'
 
-import Menu from './Menu'
+import Menu from '../Menu'
 
 import { Actions } from 'react-native-router-flux'
 

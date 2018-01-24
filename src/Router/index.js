@@ -4,7 +4,7 @@ import Welcome from '../components/Login/Welcome'
 import ForgotPassword from '../components/Login/ForgotPassword'
 import MainContainer from '../components/MainContainer'
 import AddTask from '../components/AgendaHome/AddTask'
-import AddActivity from '../components/MainContainer/Menu/AddActivity'
+import AddActivity from '../components/Menu/AddActivity'
 
 
 const RouterComponent = () => {

@@ -64,6 +64,7 @@ export default class ForgotPassword extends Component {
     forgotService.sendMail(this.state.email).then( ( response ) => {
       console.log( response )
       this.changeLoading( false )
+      Actions.pop()
     }).catch( ( error ) => {
       console.log( error )
       this.changeLoading( false )
@@ -127,7 +128,7 @@ export default class ForgotPassword extends Component {
                      test@gmail.com
                 </Label>
                 <Input
-                  onChangeText={this.onEmailChange.bind(this)}
+                  onChangeText={( value ) => this.changeEmail( value )}
                   value={this.props.email}
                 />
               </Item>
