@@ -231,16 +231,3 @@ const styles = StyleSheet.create({
 
 export default Welcome;
 
-
-
-// const mapStateToPros = ({ auth }) => {
-//   const { email, password, error, loading } = auth;
-//     return {
-//       email,
-//       password,
-//       error,
-//       loading
-//     };
-// };
-
-// export default connect(mapStateToPros, { emailChanged, passwordChanged, loginUser })(Welcome);

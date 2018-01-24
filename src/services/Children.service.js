@@ -65,12 +65,21 @@ class ChildrenService {
 
 
 		return http.post( 'childrens', JSON.stringify( children ) )
-			
+	}
+
+	getParentsCourse(id, token) {
+		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token }
+		let http = axios.create({ baseURL: base.api,  headers: headers	})
+		url = 'childrens/getchildrensparentbycourseid/'+id
+		return http.get(url)
 
 
 	}
 
+
+
 }
 
 
-export default ChildrenService
+export const childrenService = new ChildrenService();
+

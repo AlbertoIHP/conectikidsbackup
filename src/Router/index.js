@@ -6,7 +6,6 @@ import MainContainer from '../components/MainContainer'
 import AddTask from '../components/AgendaHome/AddTask'
 import AddActivity from '../components/Menu/AddActivity'
 
-
 const RouterComponent = () => {
     return (
       <Router hideNavBar="true">
