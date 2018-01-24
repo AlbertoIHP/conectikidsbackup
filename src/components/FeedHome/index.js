@@ -172,7 +172,7 @@ class FeedHome extends Component {
     return(
         <List dataArray={ this.state.activities } renderRow={data =>
           <ListItem button noBorder onPress={() => console.log(data.name) }>
-            <Post activity={data} />
+            <Post activity={data} token={this.props.token}/>
         </ListItem>}/>
       )
 
