@@ -49,6 +49,7 @@ import { LinearGradient } from 'expo'
 import { socket } from '../../../services/socket'
 import { activityService } from '../../../services/Activity.service'
 import { childrenService } from '../../../services/Children.service'
+import { tagService } from '../../../services/Tag.service'
 import Modal from 'react-native-modal'
 
 
@@ -202,7 +203,7 @@ class AddActivity extends Component {
 
 
 
-  _publishActivity()
+   _publishActivity()
   {
 
     if( this.state.newActivity.name === '' || this.state.newActivity.description === '' )
@@ -216,7 +217,25 @@ class AddActivity extends Component {
       this.changeLoading( true )
 
 
-      activityService.store( this.state.newActivity ).then( ( response ) => {
+       activityService.store( this.state.newActivity ).then( ( response ) => {
+        console.log( response.data )
+        let activityId = response.data.id
+
+        console.log("MOSTRANDO LAS PERSONAS A GUARDAR COMO ETIQUETADAS EN LA PUBLICACION")
+        console.log("ID DE LA ACTIVIDAD: "+ activityId)
+        for( let tagged of this.state.taggedPeople )
+        {
+          let newTag = { activity_id: activityId, tagged_id: tagged.id }
+          
+          tagService.store( newTag ).then( ( response ) => {
+            console.log(response)
+          }).catch( ( error ) => {
+            console.log( error )
+          })
+
+
+        }
+
 
         socket.emit('activityAdded', JSON.stringify( this.state.newActivity ))
         this.changeLoading( false )
