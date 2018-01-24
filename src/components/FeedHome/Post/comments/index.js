@@ -37,13 +37,13 @@ import {
   Item
 } from "native-base"
 import { LinearGradient } from 'expo'
-import Comment from './components/comment';
 import Modal from 'react-native-modal'
 
 
 import { commentService } from '../../../../services/Comment.service'
 import { storage } from '../../../../services/localStorage.service'
 
+import { socket } from '../../../../services/socket'
 
 class Comments extends React.Component {
 
@@ -53,26 +53,67 @@ class Comments extends React.Component {
         this._onSend = this._onSend.bind(this)
         this.state = {
           comments: [],
-          msg: '',
-          user: [],
           activityId: this.props.activityId,
-          isModalVisible: false
+          isModalVisible: false,
+          newComment: { 
+            content: '', 
+            activity_id: this.props.activityId,
+            createdBy_id: this.props.user.id
+            }
         }
     }
 
-    async componentWillMount() {
-      let user =  await storage.getItem( 'currentUser' );
-      this.changeUser(user);
-        if (this.props.comments.length < 0 ){
-          this.changeState()
+    componentDidMount()
+    {
+      this.getComments()
+
+      socket.on('commentAdded', ( comment ) => {
+
+
+        if( comment.activity_id === this.props.activityId )
+        {
+          this.setState( previousState => {
+            this.getComments()
+            console.log("ESCUCHE EL EVENTO")
+            console.log(previousState.comments)
+            return previousState
+          })
         }
+      })
+
+
     }
-    changeState() {
+
+
+    changeComments (comments)
+    {
       this.setState( previousState => {
-        previousState.comments = this.props.comments;
+
+        previousState.comments = comments
         return previousState
       })
     }
+
+
+    getComments() 
+    {
+      commentService.getCommentsFromActivity( this.props.activityId, this.props.token)
+      .then((response) => { 
+        this.changeComments(response.data.activityComments) 
+      })
+      .catch((error) => console.log(error))
+    }
+
+
+    toObject(arr) 
+    {
+      var rv = {};
+      for (var i = 0; i < arr.length; ++i)
+        rv[i] = arr[i];
+      return rv;
+    }
+
+
     changeModal( state )
     {
       this.setState( previousState => {
@@ -80,12 +121,25 @@ class Comments extends React.Component {
         return previousState
       })
     }
-    _onSend() {
-      if(this.state.msg == ''){
+
+
+
+
+
+
+    _onSend() 
+    {
+      if(this.state.newComment.content == '')
+      {
         this.changeModal( true )
-      }else {
-        commentService.store(this.state.msg, this.state.user.id, this.state.activityId)
-        .then((response) => Actions.pop())
+      }
+      else 
+      {
+        commentService.store( this.state.newComment )
+        .then((response) => {
+          socket.emit( 'commentAdded', this.state.newComment )
+
+        })
         .catch((error) => console.log(error));
       }
     }
@@ -93,28 +147,53 @@ class Comments extends React.Component {
     changeMsg( msg )
     {
       this.setState( previousState => {
-        previousState.msg = msg
+        previousState.newComment.content = msg
         return previousState
       })
-    }
-    changeUser( user )
-    {
-      this.setState( previousState => {
-        previousState.user = user
-        return previousState
-      })
-    }
-    renderContent() {
-      if (this.state.comments.length > 0 ){
-        Object.values(this.state.comments).map((prop, key) => {
-          return (
-            <Comment info={prop.createdBy_id} text={prop.content} />
-          );
-        });
-      }
     }
 
-    render() {
+
+
+
+
+
+
+
+
+    renderContent( comment ) 
+    {
+
+      return (
+                    <View style={styles.parentContainer}>
+                        <View style={styles.container}>
+                            <View style={{flex: 1}}>
+                                <Image style={styles.image} source={{uri: comment.createdBy_id.picture}}/>
+                            </View>
+                            <View style={{flex: 6}}>
+                            <Text>
+                                <Text style={{fontWeight: 'bold'}}>
+                                    { comment.createdBy_id.name }
+                                </Text>
+                                {`: ${comment.content}`}
+                            </Text>
+                            </View>
+                        </View>
+                        <View
+                          style={{
+                            borderBottomColor: '#a5a5a5',
+                            borderBottomWidth: 0.8,
+                            height: 20
+                          }}/>
+                    </View>
+
+
+                    )
+    }
+
+
+
+    render() 
+    {
         return(
           <Container style={{ backgroundColor: 'white'}} >
               <LinearGradient colors={['#fd7292', '#fd6342']} >
@@ -137,57 +216,67 @@ class Comments extends React.Component {
 
 
             <Content style={{ backgroundColor: 'white', paddingTop: 10}} >
-              <Modal
-              isVisible={ this.state.isModalVisible }
-              onBackdropPress={() => this.setState({ isModalVisible: false })}>
-                <Container style={{ flex: 0.3, borderRadius: 40 }}>
 
-                <LinearGradient colors={['#fd7292', '#fd6342']} >
-                  <Header style={{ backgroundColor: 'transparent' }}>
+            <FlatList
+              data={this.state.comments}
+              renderItem={({ item }) =>  this.renderContent( item ) }  />
 
-                    <Left>
-                    </Left>
 
-                    <Body>
-                      <Title style={{ color: 'white' }}> Error </Title>
-                    </Body>
+            </Content>
 
-                    <Right>
-                    </Right>
-                  </Header>
-                </LinearGradient>
 
-                  <Content contentContainerStyle={{ borderRadius: 3, backgroundColor: 'white', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                    <Text>
-                      ¡ Recuerda rellenar todos los campos necesarios !
-                    </Text>
-
-                      <TouchableOpacity style={styles.touchable} onPress={() => this.setState({ isModalVisible: false })}>
-                        <LinearGradient colors={['#fd7292', '#fd6342']} style={styles.gradient} >
-                          <Text style={styles.buttonText} >
-                             Cerrar
-                          </Text>
-                        </LinearGradient>
-                      </TouchableOpacity>
-
-                  </Content>
-                </Container>
-              </Modal>
-              {
-
-                this.renderContent()
-              }
                <Footer style={{ backgroundColor: 'transparent'}}>
                <Item rounded style={{ flex: 1 }}>
                 <Input
                   placeholder="Escribe un comentario..."
                   onChangeText={ (value) => this.changeMsg(value)}
+                  value={ this.state.newComment.content }
                 />
-                <Icon active name='send' onPress={() => this._onSend() } />
+                 <Icon active name='send' onPress={() => this._onSend() } />
                 </Item>
                </Footer>
 
-            </Content>
+
+
+               <View>
+                  <Modal
+                  isVisible={ this.state.isModalVisible }
+                  onBackdropPress={() => this.setState({ isModalVisible: false })}>
+                    <Container style={{ flex: 0.3, borderRadius: 40 }}>
+
+                    <LinearGradient colors={['#fd7292', '#fd6342']} >
+                      <Header style={{ backgroundColor: 'transparent' }}>
+
+                        <Left>
+                        </Left>
+
+                        <Body>
+                          <Title style={{ color: 'white' }}> Error </Title>
+                        </Body>
+
+                        <Right>
+                        </Right>
+                      </Header>
+                    </LinearGradient>
+
+                      <Content contentContainerStyle={{ borderRadius: 3, backgroundColor: 'white', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <Text>
+                          ¡ Recuerda rellenar todos los campos necesarios !
+                        </Text>
+
+                          <TouchableOpacity style={styles.touchable} onPress={() => this.setState({ isModalVisible: false })}>
+                            <LinearGradient colors={['#fd7292', '#fd6342']} style={styles.gradient} >
+                              <Text style={styles.buttonText} >
+                                 Cerrar
+                              </Text>
+                            </LinearGradient>
+                          </TouchableOpacity>
+
+                      </Content>
+                    </Container>
+                  </Modal>
+               </View>
+
           </Container>
         )
     }

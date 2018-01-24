@@ -64,7 +64,8 @@ class Post extends React.Component {
 
 	}
 
-	componentWillMount() {
+	componentWillMount() 
+	{
 		this.getComments(this.props.activity.id);
 	}
 
@@ -90,8 +91,7 @@ class Post extends React.Component {
 	}
 
     _openComments() {
-			// console.log(this.state.comments);
-			Actions.Comments({ comments: this.state.comments, activityId: this.props.activity.id })
+			Actions.Comments({ token: this.props.token , activityId: this.props.activity.id, selectedCourse: this.props.selectedCourse, user: this.props.user })
     }
 
 	render(){

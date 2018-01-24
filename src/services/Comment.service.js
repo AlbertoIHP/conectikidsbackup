@@ -54,23 +54,21 @@ class CommentService {
 	}
 
 
-	store ( comment, id_user, id_activity)
+
+
+	store( comment )
 	{
 
 		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json' }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
-		let json = {}
-		json.access_token = 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP'
-		json.content = comment
-		json.activity_id = id_activity
-		json.createdBy_id = id_user
 
-		return http.post( 'comments', JSON.stringify(json) )
+		comment.access_token = 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP'
 
-
-
+		return http.post( 'comments', JSON.stringify( comment ) )
 	}
+
+	
 
   getCommentsFromActivity ( id, token )
   {
