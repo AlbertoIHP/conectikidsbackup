@@ -6,7 +6,6 @@ import Image from 'react-native-image-progress';
 class Comment extends React.Component {
     constructor(props){
         super(props);
-        console.log(this.props.info);
         this.state = {
             userPhoto: require('../../../img/default-profile.png'),
         }
@@ -19,14 +18,14 @@ class Comment extends React.Component {
             <View style={styles.container}>
             <View style={{flex: 1}}>
             {
-                (this.props.info && this.props.info.photoUrl) &&
+                (this.props.info.name && this.props.info.picture) &&
                 <Image
                   style={styles.image}
-                  source={{uri: this.props.info.photoUrl}}
+                  source={{uri: this.props.info.picture}}
                 />
             }
             {
-                (!this.props.info || !this.props.info.photoUrl) &&
+                (!this.props.info || !this.props.info.picture) &&
                 <Image
                   style={styles.image}
                   source={this.state.userPhoto}
@@ -35,8 +34,8 @@ class Comment extends React.Component {
             </View>
             <View style={{flex: 6}}>
             <Text>
-            <Text style={{fontWeight: 'bold'}}> {this.props.info.displayName}</Text>
-            {`: ${this.props.info.text}`}
+            <Text style={{fontWeight: 'bold'}}> {this.props.info.name}</Text>
+            {`: ${this.props.text}`}
             </Text>
             </View>
             </View>

@@ -6,6 +6,11 @@ import EvilIcon from 'react-native-vector-icons/EvilIcons';
 import Image from 'react-native-image-progress';
 // import RNFetchBlob from 'react-native-fetch-blob';
 import moment from 'moment';
+import { commentService } from '../../../services/Comment.service'
+import { Actions } from 'react-native-router-flux';
+
+
+
 
 import Comments from './comments';
 
@@ -22,10 +27,12 @@ class Post extends React.Component {
 		difMs = (new Date()).getTime() - props.activity.createdAt;
 		time = moment(date).locale("es").fromNow();
 
+		comments: []
     var re = /(?:\.([^.]+))?$/;
     let type = re.exec(this.props.activity.photoUrl)[1];
 
 		this.state = {
+			comments: [],
 			time: time,
 			liked: false,
 			userPhoto: require('./img/default-profile.png'),
@@ -57,6 +64,25 @@ class Post extends React.Component {
 
 	}
 
+	componentWillMount() {
+		this.getComments(this.props.activity.id);
+	}
+
+	getComments(idActivity) {
+		commentService.getCommentsFromActivity(idActivity, this.props.token)
+		.then((response) => { this.changeComments(response.data.activityComments) })
+		.catch((error) => console.log(error))
+	}
+
+
+	changeComments (comments){
+		this.setState( previousState => {
+
+			previousState.comments = comments
+			return previousState
+		})
+	}
+
 	_onPressLike() {
 		this.setState({
 			liked: !this.state.liked
@@ -64,10 +90,8 @@ class Post extends React.Component {
 	}
 
     _openComments() {
-        /*this.setState({
-            commentsVisible: true
-        })*/
-        this.props.onComments(this.props.activity.aid, this.props.activity.comments);
+			// console.log(this.state.comments);
+			Actions.Comments({ comments: this.state.comments })
     }
 
 	render(){
@@ -160,8 +184,7 @@ class Post extends React.Component {
                             onClose={() => this.setState({
                             commentsVisible: false
                         })}
-                            activityId={this.props.activity.aid}
-                            comments={this.props.activity.comments}
+                            comments={this.state.comments}
                         />
                     </Modal>
                 }

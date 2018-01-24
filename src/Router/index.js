@@ -5,6 +5,7 @@ import ForgotPassword from '../components/Login/ForgotPassword'
 import MainContainer from '../components/MainContainer'
 import AddTask from '../components/AgendaHome/AddTask'
 import AddActivity from '../components/Menu/AddActivity'
+import Comments from '../components/FeedHome/Post/comments'
 
 
 const RouterComponent = () => {
@@ -16,6 +17,7 @@ const RouterComponent = () => {
           <Scene key="ForgotPassword" component={ForgotPassword} title="ForgotPassword" />
           <Scene key="AddActivity" component={AddActivity} title="AddActivity" />
           <Scene key="AddTask" component={AddTask} title="AddTask" />
+          <Scene key="Comments" component={Comments} title="Comments" />
         </Scene>
       </Router>
     );
