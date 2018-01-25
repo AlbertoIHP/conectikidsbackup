@@ -47,27 +47,27 @@ import {
 import { LinearGradient } from 'expo'
 
 import { socket } from '../../../services/socket'
-import { activityService } from '../../../services/Activity.service'
+import { chatService } from '../../../services/Chat.service'
+import { chatUserService } from '../../../services/ChatUser.service'
 import { childrenService } from '../../../services/Children.service'
-import { tagService } from '../../../services/Tag.service'
+
+
+
 import Modal from 'react-native-modal'
 
 
-class AddActivity extends Component {
+class AddChat extends Component {
 
   //IMAGEN HARDCODEADA DEBE SUBIRSE CORRECTAMENTE
-
   constructor(props)
   {
     super(props);
     this.state ={ 
-      newActivity: {
-        name: '',
-        description: '',
-        createdBy_id : this.props.text.user.id,
-        course_id: this.props.text.selectedCourse,
-        urlPhoto: 'http://www.jardinesinfantiles.cl/chocolate/fotos/p1000321%20copy%20.jpg',
-        activityType: this.props.text.activityType
+      newChat: {
+      	course_id: this.props.text.selectedCourse,
+      	name: '',
+      	description: '',
+      	picture: 'https://asistencia.webv2.allus.com.co/WebAPI802/ChatNosotras/AdvancedChat/images/chat.png'
       },
       taggedPeople: [],
       loading: false,
@@ -206,7 +206,7 @@ class AddActivity extends Component {
    _publishActivity()
   {
 
-    if( this.state.newActivity.name === '' || this.state.newActivity.description === '' )
+    if( this.state.newChat.name === '' || this.state.newChat.description === '' || this.state.taggedPeople.length <= 0)
     {
       this.showTagContent( false )
       this.changeModal( true )
@@ -217,18 +217,13 @@ class AddActivity extends Component {
       this.changeLoading( true )
 
 
-       activityService.store( this.state.newActivity ).then( ( response ) => {
-        console.log( response.data )
-        let activityId = response.data.id
-
-        console.log("MOSTRANDO LAS PERSONAS A GUARDAR COMO ETIQUETADAS EN LA PUBLICACION")
-        console.log("ID DE LA ACTIVIDAD: "+ activityId)
+       chatService.store( this.state.newChat ).then( ( response ) => {
+        let chatId = response.data.id
         for( let tagged of this.state.taggedPeople )
         {
-          let newTag = { activity_id: activityId, tagged_id: tagged.id }
+          let newTag = { chat_id: chatId, user_id: tagged.id }
           
-          tagService.store( newTag ).then( ( response ) => {
-            console.log(response)
+          chatUserService.store( newTag ).then( ( response ) => {
           }).catch( ( error ) => {
             console.log( error )
           })
@@ -236,10 +231,18 @@ class AddActivity extends Component {
 
         }
 
+          let newTag = { chat_id: chatId, user_id: this.props.text.user.id }
+          
+          chatUserService.store( newTag ).then( ( response ) => {
+            socket.emit('chatAdded', JSON.stringify( this.state.newChat ))
+            this.changeLoading( false )
+            Actions.pop()
+          }).catch( ( error ) => {
+            console.log( error )
+          })
 
-        socket.emit('activityAdded', JSON.stringify( this.state.newActivity ))
-        this.changeLoading( false )
-        Actions.pop()
+
+
         
         
       }).catch( ( error ) => {
@@ -271,7 +274,7 @@ class AddActivity extends Component {
   changeName( name )
   {
     this.setState( previousState => {
-      previousState.newActivity.name = name
+      previousState.newChat.name = name
       return previousState 
     })
   }
@@ -280,7 +283,7 @@ class AddActivity extends Component {
   changeDescription( description )
   {
     this.setState( previousState => {
-      previousState.newActivity.description = description
+      previousState.newChat.description = description
       return previousState
     })
   }
@@ -428,6 +431,7 @@ class AddActivity extends Component {
   renderToTagContent()
   {
     return(
+ 
       <Container style={{ flex: 0.75, borderRadius: 40 }}>
         <Content contentContainerStyle={{ borderRadius: 3, backgroundColor: 'transparent', flex: 0.7}}>
 
@@ -480,12 +484,12 @@ class AddActivity extends Component {
                       </Header>
                     </LinearGradient>
 
-                      <Content contentContainerStyle={{ borderRadius: 3, backgroundColor: 'white', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                      <Content contentContainerStyle={{ borderRadius: 3, backgroundColor: 'white', flex: 0.8, justifyContent: 'center', alignItems: 'center' }}>
                         <Text>
                           ¡ Recuerda rellenar todos los campos necesarios !
                         </Text>
 
-                          <TouchableOpacity style={styles.touchable} onPress={() => this.setState({ isModalVisible: false })}>
+                          <TouchableOpacity style={{ width: '80%', height: '20%'}} onPress={() => this.setState({ isModalVisible: false })}>
                             <LinearGradient colors={['#fd7292', '#fd6342']} style={styles.gradient} >
                               <Text style={styles.buttonText} >
                                  Cerrar
@@ -536,24 +540,22 @@ class AddActivity extends Component {
 
           <Content style={{ backgroundColor: 'white'}} >
 
-          <Image source={require('./img/activityDescription.png')} style={{ resizeMode: 'contain', marginLeft: 10, marginTop: 10}} />
-
 
                 <Form>
                   <Item floatingLabel >
                     <Label>
                       <Icon name='md-create' style={ styles.iconInput } />
-                      Mi actividad
+                      Nombre del chat
                     </Label>
-                    <Input onChangeText={ ( value ) => this.changeName( value ) } value={this.state.newActivity.name}/>
+                    <Input onChangeText={ ( value ) => this.changeName( value ) } value={this.state.newChat.name}/>
                   </Item>
 
                   <Item floatingLabel >
                     <Label>
                       <Icon name='ios-text' style={ styles.iconInput } />
-                      Mi descripción
+                      descripcion
                     </Label>
-                    <Input onChangeText={ ( value ) => this.changeDescription( value ) } value={this.state.newActivity.description}/>
+                    <Input onChangeText={ ( value ) => this.changeDescription( value ) } value={this.state.newChat.description}/>
                   </Item>
                 </Form>
 
@@ -561,7 +563,7 @@ class AddActivity extends Component {
             <Grid>
 
               <Row style={{ marginTop: 15 }} >
-                  <Text> Etiquetas: </Text>
+                  <Text> Miembros del chat: </Text>
                   { this.state.reload ? this._renderTaggedPeopleList() : null }
               </Row>
 
@@ -574,7 +576,7 @@ class AddActivity extends Component {
                 <TouchableOpacity style={styles.touchable} onPress={this._publishActivity}>
                   <LinearGradient colors={['#fd7292', '#fd6342']} style={styles.gradient} >
                     <Text style={styles.buttonText} >
-                      Publicar
+                      Crear
                     </Text>
                   </LinearGradient>
                 </TouchableOpacity> 
@@ -611,7 +613,7 @@ class AddActivity extends Component {
                 </Left>
 
                 <Body>
-                  <Title style={{ color: 'white' }}> { this.props.text.activityType } </Title>
+                  <Title style={{ color: 'white' }}> Crear Chat </Title>
                 </Body>
 
                 <Right />
@@ -710,4 +712,4 @@ const styles = StyleSheet.create({
 })
 
 
-export default AddActivity;
+export default AddChat;

@@ -6,7 +6,8 @@ import MainContainer from '../components/MainContainer'
 import AddTask from '../components/AgendaHome/AddTask'
 import AddActivity from '../components/Menu/AddActivity'
 import Comments from '../components/FeedHome/Post/comments'
-
+import AddChat from '../components/ChatHome/AddChat'
+import Chat from '../components/ChatHome/Chat'
 const RouterComponent = () => {
     return (
       <Router hideNavBar="true">
@@ -17,6 +18,8 @@ const RouterComponent = () => {
           <Scene key="AddActivity" component={AddActivity} title="AddActivity" />
           <Scene key="AddTask" component={AddTask} title="AddTask" />
           <Scene key="Comments" component={Comments} title="Comments" />
+          <Scene key="AddChat" component={AddChat} title="AddChat" />
+          <Scene key="Chat" component={Chat} title="Chat" />
         </Scene>
       </Router>
     );

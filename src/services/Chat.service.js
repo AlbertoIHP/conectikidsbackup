@@ -67,12 +67,19 @@ class ChatService {
 
 
 		return http.post( 'chats', JSON.stringify( chat ) )
-			
+
+	}
+
+	getChatsByCourseId( id, token)
+	{
+		let headers = { 'Authorization' : 'Bearer '+token }
+
+		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
 
+		return http.get('chats/getchatsbycourseid/'+id)		
 	}
 
 }
 
-
-export default ChatService
+export const chatService = new ChatService();

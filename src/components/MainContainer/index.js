@@ -87,25 +87,33 @@ export default class MainContainer extends Component {
     let token =  await storage.getItem( 'token' )
     let user =  await storage.getItem( 'currentUser' )
 
+    if( user.role === 'teacher' )
+    {
+      courseService.getCoursesByProfessorId( user.id, token ).then( ( response ) => {
+        this.setState( (previousState) => {
+          previousState.token = token
+          previousState.user = user
+          previousState.datas = response.data.teacherCourses
 
-    courseService.getCoursesByProfessorId( user.id, token ).then( ( response ) => {
-      this.setState( (previousState) => {
-        previousState.token = token
-        previousState.user = user
-        previousState.datas = response.data.teacherCourses
 
+          //TOMAMOS POR DEFECTO EL PRIMER CURSO DEL PROFESOR, Y EMITIMOS EL EVENTO CON SU ID
+          //ENTONCES, EL FEED Y LA AGENDA DESATARAN EL EVENTO DE OBTENER LAS ACTIVIDADES Y TAREAS
+          //RESPECTIVAMENTE, SIEMPRE DEPENDIENDO DE LA ID, ENTONCES, CUANDO SE CAMBIE DE ID, SE EMITIRA
+          //NUEVAMENTE ESTE EVENTO, DE MANERA QUE, TODO SU CONETENIDO, SERA RECARGADO
 
-        //TOMAMOS POR DEFECTO EL PRIMER CURSO DEL PROFESOR, Y EMITIMOS EL EVENTO CON SU ID
-        //ENTONCES, EL FEED Y LA AGENDA DESATARAN EL EVENTO DE OBTENER LAS ACTIVIDADES Y TAREAS
-        //RESPECTIVAMENTE, SIEMPRE DEPENDIENDO DE LA ID, ENTONCES, CUANDO SE CAMBIE DE ID, SE EMITIRA
-        //NUEVAMENTE ESTE EVENTO, DE MANERA QUE, TODO SU CONETENIDO, SERA RECARGADO
-        this.changeCourseId( previousState.datas[0].id, previousState.token )
-      
-        return previousState
+          this.changeCourseId( previousState.datas[0].id, previousState.token )        
+        
+          return previousState
+        })      
+      } ).catch( ( error ) => {
+        console.log( error )
       })      
-    } ).catch( ( error ) => {
-      console.log( error )
-    })
+    }
+    else if( user.role === 'parent')
+    {
+      console.log("AQUI SE DEBE DE CREAR UN ENDPOINT PARA FILTRAR POR LOS NIÑOS DE UN PADRE")
+    }
+
     
 
 
@@ -136,6 +144,7 @@ export default class MainContainer extends Component {
         previousState.chatActive = true
         previousState.agendaActive = false
         previousState.profileActive = false
+        previousState.menuActive = false
         return previousState
       })
     }
@@ -195,6 +204,17 @@ export default class MainContainer extends Component {
       )
   }
 
+  _renderAddChatButton()
+  {
+    return (
+      <Right>
+        <Button transparent onPress={() => Actions.AddChat({text: {user: this.state.user, token: this.state.token, selectedCourse: this.state.selectedCourse } }) }>
+          <Icon style= {{ color: "white" }} name="ios-add-outline" />
+        </Button>
+      </Right>
+      )    
+  }
+
   changeSelectedCourse( courseId )
   {
     this.setState( previousState => {
@@ -221,8 +241,9 @@ export default class MainContainer extends Component {
               <Image source={ drawerCover} style={ styles.drawerCoverStyle } />
               <Image style={ styles.logoNameStyle } source={ drawerImage } />
             </Row>
-            <Row>            
-              <Text> Mis Cursos </Text>
+            <Row>
+              { this.state.user.role === 'teacher' ? <Text> Mis Cursos </Text> : <Text> Mis Hijos </Text>}            
+              
             </Row>
 
             <Row>
@@ -241,6 +262,49 @@ export default class MainContainer extends Component {
         </Content>
       </Container>
       )
+  }
+
+  _renderRightSide()
+  {
+    if( this.state.chatActive && this.state.user.role === 'teacher')
+    {
+      return(
+        this._renderAddChatButton()
+        )
+    }
+    else if( this.state.agendaActive && this.state.user.role === 'teacher')
+    {
+      return(
+        this._renderAddTaskButon()
+        )
+    }
+    else
+    {
+      return ( <Right /> )
+    }
+  }
+
+  renderFabIcon()
+  {
+    if( this.state.user.role === 'teacher' )
+    {
+      return (
+              <View style={{ flex: 0.8, height: '100%' }} >
+                <Fab
+                  active={ true }
+                  direction="up"
+                  containerStyle={{ }}
+                  style={ styles.fabIcon }
+                  onPress={() => this._changeState(5) }>
+                  <Icon name="add" />
+                </Fab>
+              </View>
+        )
+    }
+    else
+    {
+      return null
+    }
   }
 
 
@@ -278,7 +342,8 @@ export default class MainContainer extends Component {
                 </Body>
 
 
-                { this.state.agendaActive ? this._renderAddTaskButon() : <Right /> }                
+                { this._renderRightSide() }
+                               
 
               </Header>
             </LinearGradient>
@@ -307,16 +372,7 @@ export default class MainContainer extends Component {
                 <Image  style={ styles.tabIcon } source={ this.state.chatActive ? require('./img/Chatactiv.png') : require('./img/Chat.png')} />  
               </Button>
 
-              <View style={{ flex: 0.8, height: '100%' }} >
-                <Fab
-                  active={ true }
-                  direction="up"
-                  containerStyle={{ }}
-                  style={ styles.fabIcon }
-                  onPress={() => this._changeState(5) }>
-                  <Icon name="add" />
-                </Fab>
-              </View>
+              { this.renderFabIcon() }
 
 
               <Button transparent onPress={() => this._changeState(3) }>

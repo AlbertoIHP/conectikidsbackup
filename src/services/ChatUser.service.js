@@ -71,7 +71,18 @@ class ChatUserService {
 
 	}
 
+
+	getChatsByCourseAndUserId( id, token)
+	{
+		let headers = { 'Authorization' : 'Bearer '+token }
+
+		let http = axios.create({ baseURL: base.api,  headers: headers	})
+
+
+		return http.get('chatsusers/getchatsbycourseanduserid/'+id)		
+	}
+
+
 }
 
-
-export default ChatUserService
+export const chatUserService = new ChatUserService();

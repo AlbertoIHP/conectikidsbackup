@@ -64,14 +64,22 @@ class MessageService {
 
 		message.access_token = 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP'
 
-
 		return http.post( 'messages', JSON.stringify( message ) )
-			
-
-
 	}
 
+
+	getMessagesByCourseId( id, token )
+	{
+		let headers = { 'Authorization' : 'Bearer '+token }
+
+		let http = axios.create({ baseURL: base.api,  headers: headers	})
+
+
+		return http.get('messages/getmessagesbycourseid/'+id)
+			
+
+	}
 }
 
+export const messageService = new MessageService();
 
-export default MessageService

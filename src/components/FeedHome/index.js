@@ -83,7 +83,7 @@ class FeedHome extends Component {
 
       if( this.props.selectedCourse === activity.course_id )
       {
-      this.refreshActivities( this.props.selectedCourse, this.props.token, moment(new Date()).format('YYYY-MM-DD'))
+        this.refreshActivities( this.props.selectedCourse, this.props.token, moment(new Date()).format('YYYY-MM-DD'))
       }
       else
       {
