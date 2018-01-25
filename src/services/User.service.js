@@ -51,6 +51,18 @@ class UserService {
 
 
 	}
+	updateData ( id, user, token )
+	{
+
+		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token }
+
+		let http = axios.create({ baseURL: base.api,  headers: headers	})
+
+
+		return http.put('users/'+id, user)
+
+
+	}
 
 	destroy ( id, token )
 	{
