@@ -1,11 +1,19 @@
 import React, {Component} from 'react';
-import {TextArea, StyleSheet, View, Text, TouchableOpacity, Modal, Platform } from 'react-native';
+import {TextArea, StyleSheet, View,TouchableOpacity, Modal, Platform, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import VideoPlayer from 'react-native-video-player';
 import EvilIcon from 'react-native-vector-icons/EvilIcons';
 import Image from 'react-native-image-progress';
 // import RNFetchBlob from 'react-native-fetch-blob';
 import moment from 'moment';
+import { commentService } from '../../../services/Comment.service'
+import { userService } from '../../../services/User.service'
+import { Actions } from 'react-native-router-flux';
+import { Grid, Column, Row, Thumbnail, ListItem, Body, Left, Right, Card, CardItem, Button, Text, List, Label } from 'native-base'
+
+
+
+const deviceWidth = Dimensions.get("window").width;
 
 import Comments from './comments';
 
@@ -22,16 +30,20 @@ class Post extends React.Component {
 		difMs = (new Date()).getTime() - props.activity.createdAt;
 		time = moment(date).locale("es").fromNow();
 
+		comments: []
     var re = /(?:\.([^.]+))?$/;
     let type = re.exec(this.props.activity.photoUrl)[1];
 
 		this.state = {
+			comments: [],
 			time: time,
 			liked: false,
 			userPhoto: require('./img/default-profile.png'),
             path: null,
             type: type,
             commentsVisible: false,
+            activity: this.props.activity,
+            isTagsLoaded: false
 		}
 
         var me = this;
@@ -57,6 +69,56 @@ class Post extends React.Component {
 
 	}
 
+	componentWillMount() 
+	{
+		this.getComments(this.props.activity.id);
+	}
+
+	async componentDidMount()
+	{
+		
+
+		for( let i in this.state.activity.tags )
+		{
+			await userService.show( this.state.activity.tags[i].tagged_id, this.props.token ).then( ( response ) => {
+				this.setState( previousState => {
+					previousState.activity.tags[i].tagged_id = response.data
+					return previousState
+				})
+
+			}).catch( ( error ) =>{
+				console.log( error )
+			})
+		}
+
+
+
+
+			this.setState( previousState => {
+				previousState.activity.tags.length > 0 ? previousState.isTagsLoaded = true : previousState.isTagsLoaded = false				
+				return previousState
+			})
+
+
+
+
+	}
+
+	getComments(idActivity) {
+		commentService.getCommentsFromActivity(idActivity, this.props.token)
+		.then((response) => { this.changeComments(response.data.activityComments) })
+		.catch((error) => console.log(error))
+	}
+
+
+	changeComments (comments){
+		this.setState( previousState => {
+
+			previousState.comments = comments
+			return previousState
+		})
+	}
+
 	_onPressLike() {
 		this.setState({
 			liked: !this.state.liked
@@ -64,108 +126,103 @@ class Post extends React.Component {
 	}
 
     _openComments() {
-        /*this.setState({
-            commentsVisible: true
-        })*/
-        this.props.onComments(this.props.activity.aid, this.props.activity.comments);
+			Actions.Comments({ token: this.props.token , activityId: this.state.activity.id, selectedCourse: this.props.selectedCourse, user: this.props.user })
+    }
+
+    renderListItem( data )
+    {
+    	console.log("Tags")
+    	console.log(data)
+    	return(
+    		<View>
+				<Thumbnail small source={{ uri: data.tagged_id.picture }}/> 
+				<Text note> { data.tagged_id.name }</Text>
+			</View>
+    		)
+    }
+
+
+
+    renderTags( )
+    {
+    	return(
+    	 <View>
+    	 <Text note> Con: </Text>
+		 <List dataArray={ this.state.activity.tags } renderRow={ (data) => this.renderListItem( data )} />
+    	</View>
+    	)
     }
 
 	render(){
 
 		return (
-			<View style={styles.parentContainer}>
-				<View style={{flex: 0.5}}></View>
-				<View style = {styles.container}>
-					<View style={top.container}>
-						<View style={top.imageContainer}>
+              <ListItem avatar>
+		          <Card style={styles.mb}>
+		            <CardItem bordered>
+		              <Left>
+		                <Thumbnail small source={{ uri: this.state.activity.createdBy_id.picture }}/>
+		                <Body>
+		                  <Text>{ this.state.activity.createdBy_id.name } </Text>
+		                  <Text note>{ this.state.activity.createdAt.split('T')[0] } - { this.state.activity.activityType } </Text>
+		                </Body>
+		              </Left>
+		            </CardItem>
+
+		            <CardItem>
+		              <Body>
+		                <Image
+		                  style={{
+		                    alignSelf: "center",
+		                    height: 150,
+		                    resizeMode: "cover",
+		                    width: deviceWidth / 1.18,
+		                    marginVertical: 5
+		                  }}
+		                  source={{ uri: this.state.activity.urlPhoto }}
+		                />
+		                <Text>
+		                 { this.state.activity.name } : {this.state.activity.description}
+		                </Text>
+		              </Body>
+		            </CardItem>
+
+		            <CardItem style={{ paddingVertical: 0 }}>
+
+						{ this.state.isTagsLoaded ? this.renderTags() : null}
+		            </CardItem>
+
+		            <CardItem style={{ paddingVertical: 0 }}>
+		              <Left>
+			 			<TouchableOpacity
+			 				style={bottom.likeTouch}
+			 				activeOpacity={0.6}
+			 				onPress={this._onPressLike}>
+			 			<View style={bottom.likeContainer}>
 							{
-								(this.props.activity.creator && this.props.activity.creator.photoUrl) &&
-								<Image
-								  style={top.image}
-						      	  source={{uri: this.props.activity.creator.photoUrl}}
-						        />
-					    	}
-							{
-								(!this.props.activity.creator || !this.props.activity.creator.photoUrl) &&
-								<Image
-								  style={top.image}
-						          source={this.state.userPhoto}
-						        />
-					    	}
-				        </View>
-				        <View style={top.midContainer}>
-				        	{
-				        		(this.props.activity.creator) &&
-				        		<Text style={top.name}>{this.props.activity.creator.displayName}</Text>
-				        	}
-				        	{
-				        		(!this.props.activity.creator) &&
-				        		<Text style={top.name}></Text>
-				        	}
-				        	<View style={top.timeContainer}>
-				        		<EvilIcon name="clock" style={top.clock} size={20}/>
-				        		<Text style={top.timeAgo}>{this.state.time}</Text>
-				        	</View>
-				        </View>
-			        </View>
-			        <View style={mid.container}>
-						<Text style={mid.description}>{this.props.activity.description}</Text>
-					</View>
-					{(this.props.activity.photoUrl && this.state.type != "MOV") &&
-					<Image
-			          style={{height: 150}}
-			          source={{uri: this.props.activity.photoUrl}}
-			        />
-			    	}
-                    {
-                        (this.state.type == "MOV" && this.state.path) &&
-                        <VideoPlayer
-                          video={{ uri: this.state.path }}
-                        />
-                    }
-					<View
-					  style={styles.line}
-					/>
-					<View style={bottom.container}>
-						<TouchableOpacity
-							style={bottom.likeTouch}
-							activeOpacity={0.6}
-							onPress={this._onPressLike}>
-						<View style={bottom.likeContainer}>
-							{
-								(this.state.liked) &&
-								<Icon name="heart" style={[bottom.likeIcon, {color: "#F25634"}]} size={20}/>
-							}
-							{
-								(!this.state.liked) &&
-								<Icon name="heart-o" style={bottom.likeIcon} size={20}/>
-							}
-			        		<Text style={bottom.likeText}>Me gusta</Text>
-			        	</View>
-			        	</TouchableOpacity>
-                        <TouchableOpacity
-                            style={bottom.commentContainer}
-                            activeOpacity={0.6}
-                            onPress={this._openComments}>
-			        		<Icon name="comment-o" style={bottom.commentIcon} size={20}/>
-			        		<Text style={bottom.comments}>Comentarios</Text>
-                        </TouchableOpacity>
-					</View>
-				</View>
-				<View style={{flex: 0.5}}></View>
-                {
-                    this.state.commentsVisible &&
-                    <Modal visible={this.state.commentsVisible}>
-                        <Comments
-                            onClose={() => this.setState({
-                            commentsVisible: false
-                        })}
-                            activityId={this.props.activity.aid}
-                            comments={this.props.activity.comments}
-                        />
-                    </Modal>
-                }
-			</View>
+			 					(this.state.liked) &&
+			 					<Icon name="heart" style={[bottom.likeIcon, {color: "#F25634"}]} size={20}/>
+			 				}
+			 				{
+			 					(!this.state.liked) &&
+			 					<Icon name="heart-o" style={bottom.likeIcon} size={20}/>
+			 				}
+			         		<Text style={bottom.likeText}>Me gusta</Text>
+			         	</View>
+			         	</TouchableOpacity>
+		              </Left>
+
+		              <Right>
+		                 <TouchableOpacity
+                             style={bottom.commentContainer}
+                             activeOpacity={0.6}
+                             onPress={this._openComments}>
+			         		<Icon name="comment-o" style={bottom.commentIcon} size={20}/>
+			         		<Text style={bottom.comments}>Comentarios</Text>
+                         </TouchableOpacity>
+		              </Right>
+		            </CardItem>
+		          </Card>
+              </ListItem>
 		);
 	}
 }
@@ -196,6 +253,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.8,
     shadowRadius: 3,
+  },
+  mb: {
+    marginBottom: 15,
+    marginRight: 15
   },
   line: {
   	paddingTop: 10,

@@ -42,7 +42,6 @@ class FeedHome extends Component {
     super(props)
     this.setModalVisible = this.setModalVisible.bind(this)
     this._onDateChange = this._onDateChange.bind(this)
-    this.openComments = this.openComments.bind(this)
 
     today = this.getStartDay(new Date())
     activities = []
@@ -56,7 +55,6 @@ class FeedHome extends Component {
       modalVisible: true,
       loading: false,
     }
-    this.getActivities(today)
 
 
   }
@@ -147,17 +145,6 @@ class FeedHome extends Component {
   }
 
 
-  //Funciones copiadas y pegadas deben ser modificadas
-  openComments( activityId, comments )
-  {
-
-  }
-
-  getActivities( date )
-  {
-
-  }
-
   _renderContent()
   {
     if( this.state.activities.length <= 0 )
@@ -171,9 +158,7 @@ class FeedHome extends Component {
 
     return(
         <List dataArray={ this.state.activities } renderRow={data =>
-          <ListItem button noBorder onPress={() => console.log(data.name) }>
-            <Post activity={data} />
-        </ListItem>}/>
+            <Post user={ this.props.user } selectedCourse={ this.props.selectedCourse } token={this.props.token} activity={data}/>  } />
       )
 
   }

@@ -3,78 +3,67 @@ import { socket } from './socket'
 import axios from 'axios'
 
 
+class TagService {
 
-class UserService {
-
-	index ( token )
+	index( token )
 	{
 
 		let headers = { 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-
-		return http.get('users')
+		return http.get('tags')
 
 	}
 
-	show ( id, token )
+	show( id, token )
 	{
 		let headers = { 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
+		return http.get('tags/'+id)
 
-		return http.get('users/'+id)
 
 	}
 
-	update ( id, user, token )
+	update( id, tag, token )
 	{
-		user.password = user.password.toLowerCase()
 
 		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
 
-		return http.put('users/'+id, user)
-
+		return http.put('tags/'+id,  tag)
 
 	}
 
-	destroy ( id, token )
+	destroy( id, token )
 	{
 		let headers = { 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
+		return http.delete('tags/'+id)
 
-		return http.delete('users/'+id)
-			
 
 	}
 
 
-	store ( user )
+	store( tag )
 	{
-		user.email = user.email.toLowerCase()
-		user.password = user.password.toLowerCase()
-		user.access_token = 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP'
 
 		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json' }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
+		tag.access_token = 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP'
 
-		return http.post( 'users', JSON.stringify( user ) )
-			
-
-
+		return http.post( 'tags', JSON.stringify( tag ) )
 	}
+
 
 }
 
-
-export const userService = new UserService();
-
+export const tagService = new TagService();

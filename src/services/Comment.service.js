@@ -4,7 +4,7 @@ import axios from 'axios'
 
 
 
-class UserService {
+class CommentService {
 
 	index ( token )
 	{
@@ -13,8 +13,8 @@ class UserService {
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
+		return http.get('comments')
 
-		return http.get('users')
 
 	}
 
@@ -24,21 +24,19 @@ class UserService {
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
+		return http.get('comments/'+id)
 
-		return http.get('users/'+id)
 
 	}
 
-	update ( id, user, token )
+	update ( id, comment, token )
 	{
-		user.password = user.password.toLowerCase()
 
 		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
-
-		return http.put('users/'+id, user)
+		return http.put('comments/'+id, comment)
 
 
 	}
@@ -50,31 +48,39 @@ class UserService {
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
 
-		return http.delete('users/'+id)
-			
+		return http.delete('comments/'+id)
+
 
 	}
 
 
-	store ( user )
+
+
+	store( comment )
 	{
-		user.email = user.email.toLowerCase()
-		user.password = user.password.toLowerCase()
-		user.access_token = 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP'
 
 		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json' }
 
 		let http = axios.create({ baseURL: base.api,  headers: headers	})
 
+		comment.access_token = 'rpDYa3XOEkAtYk67v5lDYprLz8cdbguP'
 
-		return http.post( 'users', JSON.stringify( user ) )
-			
-
-
+		return http.post( 'comments', JSON.stringify( comment ) )
 	}
 
+	
+
+  getCommentsFromActivity ( id, token )
+  {
+    let headers = { 'Authorization' : 'Bearer '+token }
+
+    let http = axios.create({ baseURL: base.api,  headers: headers	})
+
+    return http.get('comments/getactivitycomments/'+id)
+
+
+  }
 }
 
 
-export const userService = new UserService();
-
+export const commentService = new CommentService();
