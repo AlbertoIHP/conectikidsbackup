@@ -432,13 +432,6 @@ class AddActivity extends Component {
         <LinearGradient colors={['#fd7292', '#fd6342']} >
           <Header searchBar rounded style={{ backgroundColor: 'transparent' }}>
 
-            <Button 
-            transparent 
-            onPress={() => this.props.navigation.goBack()}
-            style={{ marginRight: '5%'}}>
-              <Icon name="arrow-back" />
-            </Button>
-
             <Item>
               <Icon name="ios-search" />
               <Input 

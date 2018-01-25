@@ -34,7 +34,8 @@ import {
   Column,
   Spinner,
   Input,
-  Item
+  Item,
+  Thumbnail
 } from "native-base"
 import { LinearGradient } from 'expo'
 import Modal from 'react-native-modal'
@@ -138,6 +139,7 @@ class Comments extends React.Component {
         commentService.store( this.state.newComment )
         .then((response) => {
           socket.emit( 'commentAdded', this.state.newComment )
+          this.changeMsg('')
 
         })
         .catch((error) => console.log(error));
@@ -164,30 +166,25 @@ class Comments extends React.Component {
     {
 
       return (
-                    <View style={styles.parentContainer}>
-                        <View style={styles.container}>
-                            <View style={{flex: 1}}>
-                                <Image style={styles.image} source={{uri: comment.createdBy_id.picture}}/>
-                            </View>
-                            <View style={{flex: 6}}>
-                            <Text>
-                                <Text style={{fontWeight: 'bold'}}>
-                                    { comment.createdBy_id.name }
-                                </Text>
-                                {`: ${comment.content}`}
-                            </Text>
-                            </View>
-                        </View>
-                        <View
-                          style={{
-                            borderBottomColor: '#a5a5a5',
-                            borderBottomWidth: 0.8,
-                            height: 20
-                          }}/>
-                    </View>
 
-
-                    )
+              <ListItem avatar>
+                <Left>
+                  <Thumbnail small  source={{ uri: comment.createdBy_id.picture }} />
+                </Left>
+                <Body>
+                  <Text>
+                    {comment.content}
+                  </Text>
+                  <Text numberOfLines={1} note>
+                    {comment.createdBy_id.name}
+                  </Text>
+                </Body>
+                <Right>
+                  <Text note>
+                    {comment.createdAt.split('T')[0]}
+                  </Text>
+                </Right>
+              </ListItem>)
     }
 
 
