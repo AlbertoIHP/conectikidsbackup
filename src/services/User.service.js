@@ -28,10 +28,31 @@ class UserService {
 		return http.get('users/'+id)
 
 	}
+	curentUser ( token )
+	{
+		let headers = { 'Authorization' : 'Bearer '+token }
+
+		let http = axios.create({ baseURL: base.api,  headers: headers	})
+
+		return http.get('users/me')
+
+	}
 
 	update ( id, user, token )
 	{
 		user.password = user.password.toLowerCase()
+
+		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token }
+
+		let http = axios.create({ baseURL: base.api,  headers: headers	})
+
+
+		return http.put('users/'+id, user)
+
+
+	}
+	updateData ( id, user, token )
+	{
 
 		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token }
 
@@ -51,7 +72,7 @@ class UserService {
 
 
 		return http.delete('users/'+id)
-			
+
 
 	}
 
@@ -68,7 +89,7 @@ class UserService {
 
 
 		return http.post( 'users', JSON.stringify( user ) )
-			
+
 
 
 	}
@@ -76,5 +97,4 @@ class UserService {
 }
 
 
-export const userService = new UserService();
-
+export const userServices = new UserService();

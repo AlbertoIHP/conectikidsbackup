@@ -8,6 +8,9 @@ import AddActivity from '../components/Menu/AddActivity'
 import Comments from '../components/FeedHome/Post/comments'
 import AddChat from '../components/ChatHome/AddChat'
 import Chat from '../components/ChatHome/Chat'
+import ChangeUser from '../components/ProfileHome/ChangeUser'
+
+
 const RouterComponent = () => {
     return (
       <Router hideNavBar="true">
@@ -17,6 +20,7 @@ const RouterComponent = () => {
           <Scene key="ForgotPassword" component={ForgotPassword} title="ForgotPassword" />
           <Scene key="AddActivity" component={AddActivity} title="AddActivity" />
           <Scene key="AddTask" component={AddTask} title="AddTask" />
+          <Scene key="ChangeUser" component={ChangeUser} title="ChangeUser" />
           <Scene key="Comments" component={Comments} title="Comments" />
           <Scene key="AddChat" component={AddChat} title="AddChat" />
           <Scene key="Chat" component={Chat} title="Chat" />

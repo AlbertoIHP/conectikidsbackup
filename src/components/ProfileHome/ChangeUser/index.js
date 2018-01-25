@@ -27,50 +27,35 @@ import {
 } from 'native-base'
 import { LinearGradient } from 'expo'
 import { Actions } from 'react-native-router-flux'
-import { forgotService } from '../../services/ForgotPassword.service'
+import { userServices } from '../../../services/User.service';
 
-
-
-export default class ForgotPassword extends Component {
-
+export default class ChangeUser extends Component {
   constructor( props )
   {
     super( props )
 
 
-    this.state = { email: '', loading: false }
+    this.state = {
+      email: this.props.text.user.email,
+      loading: false,
+      rut: this.props.text.user.rut,
+      name: this.props.text.user.name
+    }
   }
 
-  changeEmail( email )
-  {
-    this.setState( previousState => {
-      previousState.email = email
-      return previousState
-    })
-  }
-
-  changeLoading( state )
-  {
-    this.setState( previousState => {
-      previousState.loading = state
-      return previousState
-    })
-  }
-
-
-  recoverPass()
-  {
-    this.changeLoading( true )
-    forgotService.sendMail(this.state.email).then( ( response ) => {
-      console.log( response )
-      this.changeLoading( false )
-      Actions.pop()
-    }).catch( ( error ) => {
-      console.log( error )
-      this.changeLoading( false )
-    })
-
-
+  sendData() {
+    this.state.loading =true
+    let newUser = {};
+    newUser.email = this.state.email;
+    newUser.rut = this.state.rut;
+    newUser.name = this.state.name;
+    newUser.picture = this.props.text.user.picture;
+    userServices.updateData(this.props.text.user.id,newUser,this.props.text.token)
+      .then((response) => {
+        this.state.loading = false
+        Actions.pop()
+      })
+      .catch((error) => console.log(error));
   }
 
   renderButton()
@@ -80,26 +65,41 @@ export default class ForgotPassword extends Component {
       }
 
       return (
-        <TouchableOpacity style={styles.touchable} onPress={() => this.recoverPass()}>
+        <TouchableOpacity style={styles.touchable} onPress={() => this.sendData()}>
           <LinearGradient
             colors={['#fd7292', '#fd6342']}
             style={styles.gradientButton}
           >
             <Text
               style={styles.buttonText}
-            >Enviar Email</Text>
+            >Cambiar datos</Text>
           </LinearGradient>
         </TouchableOpacity>
     );
   }
 
+  onChangeEmail(email) {
+    this.setState( previousState => {
+      previousState.email = email
+      return previousState
+    })
+  }
+  onChangeRut(rut) {
+    this.setState( previousState => {
+      previousState.rut = rut
+      return previousState
+    })
+  }
+  onChangeName(name) {
+    this.setState( previousState => {
+      previousState.name = name
+      return previousState
+    })
+  }
+
   render() {
     return (
       <Container>
-        <Image
-          source={require('./img/BackgroundLogin.png')}
-          style={styles.imageBackground}
-        />
         <Content>
           <LinearGradient
             colors={['#fd7292', '#fd6342']}
@@ -115,7 +115,7 @@ export default class ForgotPassword extends Component {
                 </Button>
               </Left>
               <Body>
-                <Title style={{ color: 'white' }}>¡Recupérala!</Title>
+                <Title style={{ color: 'white' }}>Cambiar parámetros</Title>
               </Body>
               <Right />
             </Header>
@@ -125,11 +125,31 @@ export default class ForgotPassword extends Component {
               <Item floatingLabel>
                 <Label>
                   <Icon name='mail' style={{ fontSize: 20, color: 'grey', marginRight: 50 }} />
-                     test@gmail.com
+                     Prueba@correodeprueba.cl
                 </Label>
                 <Input
-                  onChangeText={( value ) => this.changeEmail( value )}
-                  value={this.props.email}
+                  onChangeText={( value ) => this.onChangeEmail(value)}
+                  value={this.state.email}
+                />
+              </Item>
+              <Item floatingLabel>
+                <Label>
+                  <Icon name='mail' style={{ fontSize: 20, color: 'grey', marginRight: 50 }} />
+                     Nombre
+                </Label>
+                <Input
+                  onChangeText={( value ) => this.onChangeName(value)}
+                  value={this.state.name}
+                />
+              </Item>
+              <Item floatingLabel>
+                <Label>
+                  <Icon name='mail' style={{ fontSize: 20, color: 'grey', marginRight: 50 }} />
+                     RUT
+                </Label>
+                <Input
+                  onChangeText={( value ) => this.onChangeRut(value)}
+                  value={this.state.rut}
                 />
               </Item>
             </Form>
@@ -147,11 +167,6 @@ export default class ForgotPassword extends Component {
 }
 
 const styles = StyleSheet.create({
-  imageBackground: {
-    flex: 1,
-    position: 'absolute',
-    height: '100%'
-  },
   touchable: {
     marginTop: 20,
     marginLeft: 20,
@@ -184,10 +199,4 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     fontSize: 15
   },
-  errorTextStyle: {
-    fontSize: 15,
-    alignSelf: 'center',
-    color: 'red',
-    marginBottom: 10
-  }
 });

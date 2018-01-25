@@ -58,7 +58,7 @@ const drawerImage = require("./img/logoname.png")
 
 import EventEmitter from "react-native-eventemitter"
 
-  
+
 
 export default class MainContainer extends Component {
 
@@ -66,10 +66,10 @@ export default class MainContainer extends Component {
   {
     super(props)
 
-    this.state = { 
-      homeActive: true, 
-      chatActive: false, 
-      agendaActive: false, 
+    this.state = {
+      homeActive: true,
+      chatActive: false,
+      agendaActive: false,
       profileActive: false,
       menuActive: false,
       shadowOffsetWidth: 1,
@@ -118,6 +118,7 @@ export default class MainContainer extends Component {
 
 
 
+
   }
 
 
@@ -127,7 +128,7 @@ export default class MainContainer extends Component {
     if( resp === 1)
     {
 
-      
+
       this.setState( previousState => {
         previousState.homeActive = true
         previousState.chatActive = false
@@ -179,7 +180,7 @@ export default class MainContainer extends Component {
         previousState.profileActive = false
         previousState.menuActive = true
         return previousState
-      })      
+      })
     }
   }
 
@@ -187,7 +188,7 @@ export default class MainContainer extends Component {
   {
     this.drawer._root.close()
   }
-  
+
   openDrawer()
   {
     this.drawer._root.open()
@@ -199,6 +200,16 @@ export default class MainContainer extends Component {
       <Right>
         <Button transparent onPress={() => Actions.AddTask({text: {user: this.state.user, token: this.state.token, selectedCourse: this.state.selectedCourse } }) }>
           <Icon style= {{ color: "white" }} name="ios-add-outline" />
+        </Button>
+      </Right>
+      )
+  }
+  _renderChangeProfile()
+  {
+    return (
+      <Right>
+        <Button transparent onPress={() => Actions.ChangeUser({text: {user: this.state.user, token: this.state.token, selectedCourse: this.state.selectedCourse } }) }>
+          <Icon style= {{ color: "white" }} name="settings" />
         </Button>
       </Right>
       )
@@ -247,7 +258,7 @@ export default class MainContainer extends Component {
             </Row>
 
             <Row>
-              <List dataArray={ this.state.datas } renderRow={data => 
+              <List dataArray={ this.state.datas } renderRow={data =>
                 <ListItem button noBorder onPress={() => this.changeCourseId( data.id, this.state.token ) }>
                     <Left>
                       <Icon active name={"ios-people-outline"} style={ styles.IconStyle } />
@@ -338,7 +349,7 @@ export default class MainContainer extends Component {
                   { this.state.agendaActive ? <Title style={{ color: 'white' }}>Agenda</Title>: null }
 
                   { this.state.menuActive ? <Title style={{ color: 'white' }}>Menu</Title>: null }
-                  
+
                 </Body>
 
 
@@ -365,11 +376,11 @@ export default class MainContainer extends Component {
             <FooterTab style={{ backgroundColor: 'white' }} >
 
               <Button transparent onPress={() => this._changeState(1) }>
-                <Image  style={ styles.tabIcon } source={ this.state.homeActive ? require('./img/Homeactiv.png') : require('./img/Home.png')} />         
+                <Image  style={ styles.tabIcon } source={ this.state.homeActive ? require('./img/Homeactiv.png') : require('./img/Home.png')} />
               </Button>
 
               <Button transparent onPress={() => this._changeState(2) }>
-                <Image  style={ styles.tabIcon } source={ this.state.chatActive ? require('./img/Chatactiv.png') : require('./img/Chat.png')} />  
+                <Image  style={ styles.tabIcon } source={ this.state.chatActive ? require('./img/Chatactiv.png') : require('./img/Chat.png')} />
               </Button>
 
               { this.renderFabIcon() }
@@ -396,34 +407,34 @@ export default class MainContainer extends Component {
 }
 
 const styles = StyleSheet.create({
-  container: 
+  container:
   {
     backgroundColor: "#FFF"
   },
-  text: 
+  text:
   {
     alignSelf: "center",
     marginBottom: 7
   },
-  mb: 
+  mb:
   {
     marginBottom: 15
   },
-  gradientHeader: 
+  gradientHeader:
   {
   },
   tabIcon:
-  { 
-    resizeMode: 'contain', 
-    height: '95%', 
-    width: '95%' 
+  {
+    resizeMode: 'contain',
+    height: '95%',
+    width: '95%'
   },
   fabIcon:
-  { 
+  {
     ...Platform.select({
-      ios: 
+      ios:
       {
-        backgroundColor: '#fd6656', 
+        backgroundColor: '#fd6656',
         position: 'relative',
         flex: 1,
         justifyContent: 'center',
@@ -433,7 +444,7 @@ const styles = StyleSheet.create({
       },
       android:
       {
-        backgroundColor: '#fd6656', 
+        backgroundColor: '#fd6656',
         position: 'relative',
         flex: 0.95,
         justifyContent: 'center',
@@ -444,13 +455,13 @@ const styles = StyleSheet.create({
       }
     })
   },
-  text: 
+  text:
   {
     fontWeight: Platform.OS === "ios" ? "500" : "400",
     fontSize: 16,
     marginLeft: 20
   },
-  badgeText: 
+  badgeText:
   {
     fontSize: Platform.OS === "ios" ? 13 : 11,
     fontWeight: "400",
@@ -458,37 +469,37 @@ const styles = StyleSheet.create({
     marginTop: Platform.OS === "android" ? -3 : undefined
   },
   badgeStyle:
-  { 
-    borderRadius: 3, 
-    height: 25, 
+  {
+    borderRadius: 3,
+    height: 25,
     width: 72
   },
-  IconStyle: 
-  { 
-    color: "#fd6b71", 
-    fontSize: 26, 
-    width: 30 
+  IconStyle:
+  {
+    color: "#fd6b71",
+    fontSize: 26,
+    width: 30
   },
   drawContainerStyle:
-  { 
-    flex: 1, 
-    backgroundColor: "#fff", 
-    top: -1 
+  {
+    flex: 1,
+    backgroundColor: "#fff",
+    top: -1
   },
   logoNameStyle:
-  { 
-    marginTop: 6, 
-    flex: 1, 
-    justifyContent: 'center', 
-    alignContent: 'center', 
-    width: 150, 
-    height: 140, 
-    resizeMode: 'contain' 
+  {
+    marginTop: 6,
+    flex: 1,
+    justifyContent: 'center',
+    alignContent: 'center',
+    width: 150,
+    height: 140,
+    resizeMode: 'contain'
   },
   drawerCoverStyle:
-  { 
-    position: 'absolute', 
-    width: '100%', 
-    height: '100%' 
+  {
+    position: 'absolute',
+    width: '100%',
+    height: '100%'
   }
 })
