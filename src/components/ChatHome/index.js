@@ -60,13 +60,12 @@ class ChatHome extends React.Component {
       this.getComments( this.props.selectedCourse )
 
       socket.on('chatAdded', ( chat ) => {
+        chat = JSON.parse(chat)
+        console.log(chat)
+        console.log( this.state.selectedCourse )
         if( chat.course_id === this.state.selectedCourse )
         {
-          this.setState( previousState => {
-            this.getComments( this.state.selectedCourse )
-            
-            return previousState
-          })
+          this.getComments( this.state.selectedCourse)
         }
       })
 
@@ -98,6 +97,7 @@ class ChatHome extends React.Component {
 
     getComments( selectedCourse ) 
     {
+      console.log( selectedCourse )
 
       chatUserService.getChatsByCourseAndUserId(  selectedCourse+'&'+this.props.user.id , this.props.token)
       .then((response) => {

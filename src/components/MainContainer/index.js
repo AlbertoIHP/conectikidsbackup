@@ -289,6 +289,10 @@ export default class MainContainer extends Component {
         this._renderAddTaskButon()
         )
     }
+    else if( this.state.profileActive && this.state.user.role === 'teacher')
+    {
+      return( this._renderChangeProfile() )
+    }
     else
     {
       return ( <Right /> )
