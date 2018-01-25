@@ -28,6 +28,15 @@ class UserService {
 		return http.get('users/'+id)
 
 	}
+	curentUser ( token )
+	{
+		let headers = { 'Authorization' : 'Bearer '+token }
+
+		let http = axios.create({ baseURL: base.api,  headers: headers	})
+
+		return http.get('users/me')
+
+	}
 
 	update ( id, user, token )
 	{
@@ -51,7 +60,7 @@ class UserService {
 
 
 		return http.delete('users/'+id)
-			
+
 
 	}
 
@@ -68,7 +77,7 @@ class UserService {
 
 
 		return http.post( 'users', JSON.stringify( user ) )
-			
+
 
 
 	}
@@ -76,4 +85,4 @@ class UserService {
 }
 
 
-export default UserService
+export const userServices = new UserService();

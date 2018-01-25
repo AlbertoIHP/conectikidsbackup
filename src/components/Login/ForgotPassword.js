@@ -58,7 +58,7 @@ export default class ForgotPassword extends Component {
   }
 
 
-  recoverPass() 
+  recoverPass()
   {
     this.changeLoading( true )
     forgotService.sendMail(this.state.email).then( ( response ) => {
@@ -73,7 +73,7 @@ export default class ForgotPassword extends Component {
 
   }
 
-  renderButton() 
+  renderButton()
   {
       if (this.state.loading) {
         return <Spinner color='#fd6342' />;
@@ -191,5 +191,3 @@ const styles = StyleSheet.create({
     marginBottom: 10
   }
 });
-
-
