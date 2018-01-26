@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import {
   View,
-  Text,
   TextInput,
   StyleSheet,
   FlatList,
@@ -35,7 +34,8 @@ import {
   Spinner,
   Input,
   Item,
-  Thumbnail
+  Thumbnail,
+  Text
 } from "native-base"
 import { LinearGradient } from 'expo'
 import Modal from 'react-native-modal'
@@ -173,10 +173,10 @@ class Comments extends React.Component {
                 </Left>
                 <Body>
                   <Text>
-                    {comment.content}
-                  </Text>
-                  <Text numberOfLines={1} note>
                     {comment.createdBy_id.name}
+                  </Text>
+                  <Text note>
+                    {comment.content}
                   </Text>
                 </Body>
                 <Right>
@@ -192,8 +192,11 @@ class Comments extends React.Component {
     render() 
     {
         return(
-          <Container style={{ backgroundColor: 'white'}} >
-              <LinearGradient colors={['#fd7292', '#fd6342']} >
+
+
+
+        <Content contentContainerStyle={{ flex: 2, backgroundColor: 'white' }} scrollEnabled={false}>
+               <LinearGradient colors={['#fd7292', '#fd6342']} >
                 <Header style={{ backgroundColor: 'transparent' }}>
 
                   <Left>
@@ -212,18 +215,16 @@ class Comments extends React.Component {
               </LinearGradient>
 
 
-            <Content style={{ backgroundColor: 'white', paddingTop: 10}} >
-
+          <ScrollView style={{ backgroundColor: 'white', paddingTop: 10}} >
+       
             <FlatList
               data={this.state.comments}
               renderItem={({ item }) =>  this.renderContent( item ) }  />
-
-
-            </Content>
-
-
-               <Footer style={{ backgroundColor: 'transparent'}}>
-               <Item rounded style={{ flex: 1 }}>
+         
+          </ScrollView>
+        
+           {/* Footer content here */}
+               <Item rounded style={{ height: 30, marginBottom: 5 }}>
                 <Input
                   placeholder="Escribe un comentario..."
                   onChangeText={ (value) => this.changeMsg(value)}
@@ -231,8 +232,6 @@ class Comments extends React.Component {
                 />
                  <Icon active name='send' onPress={() => this._onSend() } />
                 </Item>
-               </Footer>
-
 
 
                <View>
@@ -241,7 +240,7 @@ class Comments extends React.Component {
                   onBackdropPress={() => this.setState({ isModalVisible: false })}>
                     <Container style={{ flex: 0.3, borderRadius: 40 }}>
 
-                    <LinearGradient colors={['#fd7292', '#fd6342']} >
+                    <LinearGradient colors={['#fd7292', '#fd6342']} style={{ height: 30}}>
                       <Header style={{ backgroundColor: 'transparent' }}>
 
                         <Left>
@@ -261,7 +260,7 @@ class Comments extends React.Component {
                           ¡ Recuerda rellenar todos los campos necesarios !
                         </Text>
 
-                          <TouchableOpacity style={styles.touchable} onPress={() => this.setState({ isModalVisible: false })}>
+                          <TouchableOpacity style={[styles.touchable, { width: '80%', height: 40, paddingTop: 10}]} onPress={() => this.setState({ isModalVisible: false })}>
                             <LinearGradient colors={['#fd7292', '#fd6342']} style={styles.gradient} >
                               <Text style={styles.buttonText} >
                                  Cerrar
@@ -273,8 +272,8 @@ class Comments extends React.Component {
                     </Container>
                   </Modal>
                </View>
+        </Content>
 
-          </Container>
         )
     }
 }
@@ -292,11 +291,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end'
   },
   touchable: {
-    marginTop: 20,
-    marginLeft: 20,
-    marginRight: 20,
-    marginBottom: 5,
-    height: 50
+
   },
   gradient: {
     flex: 1,

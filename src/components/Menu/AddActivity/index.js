@@ -52,6 +52,8 @@ import { childrenService } from '../../../services/Children.service'
 import { tagService } from '../../../services/Tag.service'
 import Modal from 'react-native-modal'
 
+import { ImagePicker } from 'expo'
+
 
 class AddActivity extends Component {
 
@@ -66,7 +68,7 @@ class AddActivity extends Component {
         description: '',
         createdBy_id : this.props.text.user.id,
         course_id: this.props.text.selectedCourse,
-        urlPhoto: 'http://www.jardinesinfantiles.cl/chocolate/fotos/p1000321%20copy%20.jpg',
+        urlPhoto: false,
         activityType: this.props.text.activityType
       },
       taggedPeople: [],
@@ -107,7 +109,7 @@ class AddActivity extends Component {
 
     this.setState( previousState => {
       previousState.data = [
-      {key: require('./img/photo-camera.png'), func: this.getPhotos},
+      {key: require('./img/photo-camera.png'), func: this._openCamera},
       {key: require('./img/picture.png'), func: this._explore},
       {key: require('./img/Feeling.png')},
       {key: require('./img/user.png'), func:this._tag}
@@ -152,52 +154,47 @@ class AddActivity extends Component {
     this.changeModal( true )
   }
 
-
-
-  _explore()
+  async _explore()
   {
-    console.log("Aqui va la logica de subir la foto")
-    // console.log("started");
-    // Camera.uploadPhoto('library')
-    // .then(function(url){
-    //   console.log("ended");
-    //   this.setState({photoUrl: url});
-    // }.bind(this));
+    console.log("Aqui va la logica para abrir el rollo ")
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+    });
+
+    console.log(result);
+
+    if (!result.cancelled) 
+    {
+      this.setState( previousState => {
+        previousState.newActivity.urlPhoto = result.uri
+        return previousState
+      });
+    }
+
   }
 
 
-
-
-  _openCamera()
+  async _openCamera()
   {
     console.log("Aqui debe ir la logica para abrir la camara (Dependera si es Android o IOS)")
-    // this.setState({
-    //   loading: true
-    // })
-    // Camera.uploadPhoto('camera')
-    // .then(function(url){
-    //   console.log(url);
-    //   this.setState({
-    //     photoUrl: url,
-    //     loading: false
-    //   });
-    // }.bind(this)).catch(error => {
-    //   this.setState({
-    //     loading: false
-    //   })
-    // });
-  }
+
+    let result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+    });
+
+    console.log(result);
+
+    if (!result.cancelled) 
+    {
+      this.setState( previousState => {
+        previousState.newActivity.urlPhoto = result.uri
+        return previousState
+      });
+    }
 
 
-  getPhotos()
-  {
-    console.log("Aqui debe ir la logica para abrir el rollo de camara")
-    // console.log('hasd');
-    // CameraRoll.getPhotos({
-    //   first: 20,
-    //   assetType: 'All'
-    // })
-    // .then(r => this.setState({ photos: r.edges }))
   }
 
 
@@ -299,7 +296,6 @@ class AddActivity extends Component {
 
     if( someone.isTagged )
     {
-      console.log("ELIMINANDO TAG ################################################################################")
       await this.setState( previousState => {
 
         for( let i in previousState.taggedPeople )
@@ -463,9 +459,19 @@ class AddActivity extends Component {
   renderErrorContent()
   {
     return(
-                    <Container style={{ flex: 0.5, borderRadius: 40 }}>
 
-                    <LinearGradient colors={['#fd7292', '#fd6342']} >
+
+
+
+
+
+
+
+
+
+                    <Container style={{ flex: 0.3, borderRadius: 40 }}>
+
+                    <LinearGradient colors={['#fd7292', '#fd6342']} style={{ height: 30}}>
                       <Header style={{ backgroundColor: 'transparent' }}>
 
                         <Left>
@@ -474,9 +480,9 @@ class AddActivity extends Component {
                         <Body>
                           <Title style={{ color: 'white' }}> Error </Title>
                         </Body>
-    
+
                         <Right>
-                        </Right>                    
+                        </Right>
                       </Header>
                     </LinearGradient>
 
@@ -485,7 +491,7 @@ class AddActivity extends Component {
                           ¡ Recuerda rellenar todos los campos necesarios !
                         </Text>
 
-                          <TouchableOpacity style={styles.touchable} onPress={() => this.setState({ isModalVisible: false })}>
+                          <TouchableOpacity style={[styles.touchable, { width: '80%', height: 40, paddingTop: 10}]} onPress={() => this.setState({ isModalVisible: false })}>
                             <LinearGradient colors={['#fd7292', '#fd6342']} style={styles.gradient} >
                               <Text style={styles.buttonText} >
                                  Cerrar
@@ -520,6 +526,19 @@ class AddActivity extends Component {
              )
   }
 
+
+  _renderActivityImage()
+  {
+    console.log("DIRECCION DE LA IMAGEN DE LA ACTIVIDAD")
+    console.log( this.state.newActivity.urlPhoto )
+      return(
+        <Row style={{ height: 150 }}>
+          <Image source={{ uri: this.state.newActivity.urlPhoto }} style={{ marginTop: 10, resizeMode: 'contain', height: '100%', width: '100%', justifyContent: 'center' }} />      
+        </Row>
+      )
+
+  }
+
   renderContent()
   {
     if( this.state.loading )
@@ -536,10 +555,18 @@ class AddActivity extends Component {
 
           <Content style={{ backgroundColor: 'white'}} >
 
-          <Image source={require('./img/activityDescription.png')} style={{ resizeMode: 'contain', marginLeft: 10, marginTop: 10}} />
+          <Grid>
+            <Row >
+              <Image source={require('./img/activityDescription.png')} style={{ resizeMode: 'contain', marginLeft: 10, marginTop: 10}} />
+            </Row>
 
+            { this.state.newActivity.urlPhoto ? this._renderActivityImage() : null }
 
-                <Form>
+          </Grid>
+
+          
+
+                <Form style={{ marginTop: 5}} >
                   <Item floatingLabel >
                     <Label>
                       <Icon name='md-create' style={ styles.iconInput } />
@@ -558,6 +585,10 @@ class AddActivity extends Component {
                 </Form>
 
 
+            
+              
+
+
             <Grid>
 
               <Row style={{ marginTop: 15 }} >
@@ -569,7 +600,11 @@ class AddActivity extends Component {
                 <FlatList contentContainerStyle={styles.listContainer} data={ this.state.data }
                       renderItem={({item}) => this._renderOption( item ) }/>
               </Row>
+
+              
             </Grid>  
+
+
 
                 <TouchableOpacity style={styles.touchable} onPress={this._publishActivity}>
                   <LinearGradient colors={['#fd7292', '#fd6342']} style={styles.gradient} >

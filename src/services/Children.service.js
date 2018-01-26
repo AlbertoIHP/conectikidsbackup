@@ -76,6 +76,14 @@ class ChildrenService {
 
 	}
 
+	getChildrensByUserId(id, token) {
+		let headers = { 'Accept' : 'application/json', 'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token }
+		let http = axios.create({ baseURL: base.api,  headers: headers	})
+		url = 'childrens/getchildrensbyparentid/'+id
+		return http.get(url)
+
+
+	}
 
 
 }

@@ -37,6 +37,7 @@ const deviceHeight = Dimensions.get("window").height
 const deviceWidth = Dimensions.get("window").width
 import { storage } from '../../services/localStorage.service'
 import { courseService } from '../../services/Course.service'
+import { childrenService } from '../../services/Children.service'
 
 import { LinearGradient } from 'expo'
 
@@ -112,6 +113,29 @@ export default class MainContainer extends Component {
     else if( user.role === 'parent')
     {
       console.log("AQUI SE DEBE DE CREAR UN ENDPOINT PARA FILTRAR POR LOS NIÑOS DE UN PADRE")
+
+      childrenService.getChildrensByUserId( user.id, token ).then( ( response ) => {
+        this.setState( (previousState) => {
+          previousState.token = token
+          previousState.user = user
+          previousState.datas = response.data.childrensCourse
+
+
+          //TOMAMOS POR DEFECTO EL PRIMER CURSO DEL PROFESOR, Y EMITIMOS EL EVENTO CON SU ID
+          //ENTONCES, EL FEED Y LA AGENDA DESATARAN EL EVENTO DE OBTENER LAS ACTIVIDADES Y TAREAS
+          //RESPECTIVAMENTE, SIEMPRE DEPENDIENDO DE LA ID, ENTONCES, CUANDO SE CAMBIE DE ID, SE EMITIRA
+          //NUEVAMENTE ESTE EVENTO, DE MANERA QUE, TODO SU CONETENIDO, SERA RECARGADO
+
+          console.log( response.data )
+          
+          this.changeCourseId( previousState.datas[0].course_id, previousState.token )        
+        
+          return previousState
+        })   
+      })
+
+
+
     }
 
     
@@ -242,6 +266,21 @@ export default class MainContainer extends Component {
   }
 
 
+  realoadAll( data )
+  {
+    if( this.state.user.role === 'teacher' )
+    {
+      this.changeCourseId( data.id, this.state.token )
+    }
+    else if ( this.state.user.role === 'parent' )
+    {
+      this.changeCourseId( data.course_id, this.state.token )
+    }
+
+
+  }
+
+
   _renderDrawerContent()
   {
     return (
@@ -259,7 +298,7 @@ export default class MainContainer extends Component {
 
             <Row>
               <List dataArray={ this.state.datas } renderRow={data =>
-                <ListItem button noBorder onPress={() => this.changeCourseId( data.id, this.state.token ) }>
+                <ListItem button noBorder onPress={() => this.realoadAll( data ) }>
                     <Left>
                       <Icon active name={"ios-people-outline"} style={ styles.IconStyle } />
                       <Text style={styles.text}>
@@ -289,7 +328,7 @@ export default class MainContainer extends Component {
         this._renderAddTaskButon()
         )
     }
-    else if( this.state.profileActive && this.state.user.role === 'teacher')
+    else if( this.state.profileActive)
     {
       return( this._renderChangeProfile() )
     }

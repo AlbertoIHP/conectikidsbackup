@@ -31,8 +31,8 @@ class Welcome extends Component {
     super( props )
 
     this.state = {
-      email: 'a.herrera07@ufromail.cl',
-      password: 'alberto123',
+      email: 'rara@gmail.com',
+      password: 'cristobal',
       logeando: ''
     }
 

@@ -360,7 +360,7 @@ class AddTask extends Component {
                   onBackdropPress={() => this.setState({ isModalVisible: false })}>
                     <Container style={{ flex: 0.3, borderRadius: 40 }}>
 
-                    <LinearGradient colors={['#fd7292', '#fd6342']} >
+                    <LinearGradient colors={['#fd7292', '#fd6342']} style={{ height: 30}}>
                       <Header style={{ backgroundColor: 'transparent' }}>
 
                         <Left>
@@ -369,9 +369,9 @@ class AddTask extends Component {
                         <Body>
                           <Title style={{ color: 'white' }}> Error </Title>
                         </Body>
-    
+
                         <Right>
-                        </Right>                    
+                        </Right>
                       </Header>
                     </LinearGradient>
 
@@ -380,7 +380,7 @@ class AddTask extends Component {
                           ¡ Recuerda rellenar todos los campos necesarios !
                         </Text>
 
-                          <TouchableOpacity style={styles.touchable} onPress={() => this.setState({ isModalVisible: false })}>
+                          <TouchableOpacity style={[styles.touchable, { width: '80%', height: 40, paddingTop: 10}]} onPress={() => this.setState({ isModalVisible: false })}>
                             <LinearGradient colors={['#fd7292', '#fd6342']} style={styles.gradient} >
                               <Text style={styles.buttonText} >
                                  Cerrar
