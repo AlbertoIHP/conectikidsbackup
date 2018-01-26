@@ -7,7 +7,7 @@ import Image from 'react-native-image-progress';
 // import RNFetchBlob from 'react-native-fetch-blob';
 import moment from 'moment';
 import { commentService } from '../../../services/Comment.service'
-import { userService } from '../../../services/User.service'
+import { userServices } from '../../../services/User.service'
 import { Actions } from 'react-native-router-flux';
 import { Grid, Column, Row, Thumbnail, ListItem, Body, Left, Right, Card, CardItem, Button, Text, List, Label } from 'native-base'
 
@@ -61,7 +61,7 @@ class Post extends React.Component {
 
 		for( let i in this.state.activity.tags )
 		{
-			await userService.show( this.state.activity.tags[i].tagged_id, this.props.token ).then( ( response ) => {
+			await userServices.show( this.state.activity.tags[i].tagged_id, this.props.token ).then( ( response ) => {
 				this.setState( previousState => {
 					previousState.activity.tags[i].tagged_id = response.data
 					return previousState

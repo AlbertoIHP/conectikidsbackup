@@ -51,7 +51,8 @@ import { chatService } from '../../../services/Chat.service'
 import { chatUserService } from '../../../services/ChatUser.service'
 import { childrenService } from '../../../services/Children.service'
 
-
+// IMAGENES 
+import { ImagePicker } from 'expo'
 
 import Modal from 'react-native-modal'
 
@@ -136,7 +137,6 @@ class AddChat extends Component {
 
 
 
-  //IMAGEN HARDCODEADA DEBE SUBIRSE CORRECTAMENTE
   constructor(props)
   {
     super(props);
@@ -145,7 +145,7 @@ class AddChat extends Component {
       	course_id: this.props.text.selectedCourse,
       	name: '',
       	description: '',
-      	picture: 'https://asistencia.webv2.allus.com.co/WebAPI802/ChatNosotras/AdvancedChat/images/chat.png'
+      	picture: false
       },
       taggedPeople: [],
       loading: false,
@@ -552,6 +552,24 @@ class AddChat extends Component {
              )
   }
 
+
+
+
+  _renderActivityImage()
+  {
+
+      return(
+        <Row style={{ height: 80, justifyContent: 'center' }}>
+          <Thumbnail large source={{ uri: this.state.newChat.picture }} />      
+        </Row>
+      )
+
+  }
+
+
+
+
+
   renderContent()
   {
     if( this.state.loading )
@@ -567,6 +585,16 @@ class AddChat extends Component {
       return( 
 
           <Content style={{ backgroundColor: 'white'}} >
+
+
+          <Grid>
+            <Row >
+              <Image source={require('./img/activityDescription.png')} style={{ resizeMode: 'contain', marginLeft: 10, marginTop: 10}} />
+            </Row>
+
+            { this.state.newChat.picture ? this._renderActivityImage() : null }
+
+          </Grid>
 
 
                 <Form>
