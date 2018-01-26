@@ -26,28 +26,41 @@ import {
   Label,
   Input,
   Card,
-  Fab
+  Fab,
+  ActionSheet
 } from 'native-base'
 import { Col, Row, Grid } from "react-native-easy-grid";
 import { LinearGradient } from 'expo'
 import { Actions } from 'react-native-router-flux'
 import Modal from 'react-native-modal'
+import { ImagePicker } from 'expo'
+
 
 
 const window = Dimensions.get('window');
+
+var BUTTONS = ["Tomar foto", "Abrir galería", "Cancelar"];
+var DESTRUCTIVE_INDEX = 3;
+var CANCEL_INDEX = 4;
 
 
 class ProfileHome extends Component {
 
   constructor( props )
   {
+
     super( props )
     this.state = {
       user: this.props.user,
       loading: false,
       isModalVisible: false,
-      text: ''
+      text: '',
+      data: { id: this.props.selectedCourse,
+              course_id: this.props.selectedCourse
+            }
      }
+
+
   }
 
   changeModal(state){
@@ -68,6 +81,55 @@ class ProfileHome extends Component {
 
   }
 
+
+  async _explore()
+  {
+    console.log("Aqui va la logica para abrir el rollo ")
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+    });
+
+    console.log(result);
+
+    if (!result.cancelled)
+    {
+      this.setState( previousState => {
+        previousState.newActivity.urlPhoto = result.uri
+        return previousState
+      });
+    }
+
+  }
+
+
+  async _openCamera()
+  {
+    console.log("Aqui debe ir la logica para abrir la camara (Dependera si es Android o IOS)")
+
+    let result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+    });
+
+    console.log(result);
+
+    if (!result.cancelled)
+    {
+      this.setState( previousState => {
+        previousState.newActivity.urlPhoto = result.uri
+        return previousState
+      });
+    }
+
+
+  }
+
+  onSuccess() {
+    this.props.realoadAll(this.state.data);
+  }
+
+
   render() {
     return (
     <Grid>
@@ -81,7 +143,27 @@ class ProfileHome extends Component {
           alignItems: 'center'
         }}
         >
+        <TouchableOpacity onPress={() => {
+          ActionSheet.show(
+              {
+                options: BUTTONS,
+                cancelButtonIndex: CANCEL_INDEX,
+                destructiveButtonIndex: DESTRUCTIVE_INDEX,
+                title: "Selecciona una foto"
+              },
+              buttonIndex => {
+                if (buttonIndex == 0) {
+                  this._openCamera();
+                }else if (buttonIndex == 1) {
+                  this._explore();
+                }else {
+                  console.log('cancelled');
+                }
+              }
+            )}
+        }>
           <Thumbnail large source={{ uri: this.state.user.picture }} />
+        </TouchableOpacity>
           <Text
           style={{
             fontSize: 20,
