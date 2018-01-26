@@ -58,6 +58,84 @@ import Modal from 'react-native-modal'
 
 class AddChat extends Component {
 
+
+
+
+
+  
+  async _pickImage(useCamera)
+  {
+
+    let pickerResult
+
+    if (useCamera) 
+    {
+      pickerResult = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+      });
+    } 
+    else 
+    {
+      pickerResult = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [4, 3],        
+      });
+    }
+
+    if (pickerResult.cancelled)
+    {
+      return;
+    }
+
+    console.log("ESTE ES EL RESULTADO DE LA CAMARA")
+    console.log(pickerResult)
+    this.setState( previousState => {
+      previousState.newChat.picture = pickerResult.uri
+      previousState.pickerResult = pickerResult
+
+      return previousState
+    })
+
+      
+
+  }
+
+
+
+  _handleImagePicked = async pickerResult => {
+
+    try {
+      //this.setState({ uploading: true });
+
+      if (!pickerResult.cancelled) 
+      {
+        uploadResponse = await uploadImageAsync(pickerResult.uri);
+        uploadResult = await uploadResponse.json();
+
+
+      }
+    } catch (e) {
+
+      console.log({ e });
+      alert('Upload failed, sorry :(');
+    } finally {
+
+      if( uploadResult )
+      {
+        console.log("LOGGGG")
+        console.log(uploadResult.location)
+        await this.setState( previousState => {
+          previousState.newChat.picture = uploadResult.location          
+          return previousState
+        })
+      }      
+    }
+  }
+
+
+
+
   //IMAGEN HARDCODEADA DEBE SUBIRSE CORRECTAMENTE
   constructor(props)
   {
@@ -77,12 +155,11 @@ class AddChat extends Component {
       showedUsers: [],
       toFind: '',
       reload: true,
-      data: []
+      data: [],
+      pickerResult: false
     }
 
     this._publishActivity = this._publishActivity.bind(this);
-    this._explore = this._explore.bind(this);
-    this._openCamera = this._openCamera.bind(this);
     this._tag = this._tag.bind(this)
   }
 
@@ -107,8 +184,8 @@ class AddChat extends Component {
 
     this.setState( previousState => {
       previousState.data = [
-      {key: require('./img/photo-camera.png'), func: this.getPhotos},
-      {key: require('./img/picture.png'), func: this._explore},
+      {key: require('./img/photo-camera.png'), func: () => this._pickImage( true ) },
+      {key: require('./img/picture.png'), func:() => this._pickImage( false ) },
       {key: require('./img/Feeling.png')},
       {key: require('./img/user.png'), func:this._tag}
       ]
@@ -151,55 +228,6 @@ class AddChat extends Component {
     this.showTagContent( true )
     this.changeModal( true )
   }
-
-
-
-  _explore()
-  {
-    console.log("Aqui va la logica de subir la foto")
-    // console.log("started");
-    // Camera.uploadPhoto('library')
-    // .then(function(url){
-    //   console.log("ended");
-    //   this.setState({photoUrl: url});
-    // }.bind(this));
-  }
-
-
-
-
-  _openCamera()
-  {
-    console.log("Aqui debe ir la logica para abrir la camara (Dependera si es Android o IOS)")
-    // this.setState({
-    //   loading: true
-    // })
-    // Camera.uploadPhoto('camera')
-    // .then(function(url){
-    //   console.log(url);
-    //   this.setState({
-    //     photoUrl: url,
-    //     loading: false
-    //   });
-    // }.bind(this)).catch(error => {
-    //   this.setState({
-    //     loading: false
-    //   })
-    // });
-  }
-
-
-  getPhotos()
-  {
-    console.log("Aqui debe ir la logica para abrir el rollo de camara")
-    // console.log('hasd');
-    // CameraRoll.getPhotos({
-    //   first: 20,
-    //   assetType: 'All'
-    // })
-    // .then(r => this.setState({ photos: r.edges }))
-  }
-
 
 
 
@@ -632,6 +660,52 @@ class AddChat extends Component {
 }
 
 
+
+
+async function uploadImageAsync(uri) {
+  let apiUrl = 'https://conectikidsback.herokuapp.com/upload';
+
+  let uriParts = uri.split('.');
+  let fileType = uriParts[uriParts.length - 1];
+
+  let formData = new FormData();
+  formData.append('photo', {
+    uri,
+    name: `photo.${fileType}`,
+    type: `image/${fileType}`,
+  });
+
+
+  let options = {
+    method: 'POST',
+    body: formData,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    },
+  };
+
+  return fetch(apiUrl, options);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const styles = StyleSheet.create({
   tag: 
   {
@@ -710,6 +784,9 @@ const styles = StyleSheet.create({
     marginRight: 50 
   }
 })
+
+
+
 
 
 export default AddChat;
