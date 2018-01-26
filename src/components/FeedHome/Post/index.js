@@ -48,25 +48,6 @@ class Post extends React.Component {
 
         var me = this;
 
-        // if (type == "MOV")
-        // RNFetchBlob
-        //   .config({
-        //     fileCache : true,
-        //     // by adding this option, the temp files will have a file extension
-        //     appendExt : type
-        //   })
-        //   .fetch('GET', this.props.activity.photoUrl, {
-        //     //some headers ..
-        //   })
-        //   .then((res) => {
-        //     // the temp file path with file extension png
-        //     // Beware that when using a file path as Image source on Android,
-        //     // you must prepend "file://"" before the file path
-        //     me.setState({
-        //         path: res.path()
-        //     })
-        //   })
-
 	}
 
 	componentWillMount() 
