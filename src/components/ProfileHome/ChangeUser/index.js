@@ -28,6 +28,7 @@ import {
 import { LinearGradient } from 'expo'
 import { Actions } from 'react-native-router-flux'
 import { userServices } from '../../../services/User.service';
+import EventEmitter from 'react-native-eventemitter';
 
 export default class ChangeUser extends Component {
   constructor( props )
@@ -51,6 +52,8 @@ export default class ChangeUser extends Component {
     newUser.picture = this.props.text.user.picture;
     userServices.updateData(this.props.text.user.id,newUser,this.props.text.token)
       .then((response) => {
+
+        EventEmitter.emit('UserHasChanged', response.data);
         this.state.loading = false;
         this.props.text.reloadTodo(
           this.props.text.selectedCourse,

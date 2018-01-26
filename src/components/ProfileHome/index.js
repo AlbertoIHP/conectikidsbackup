@@ -34,7 +34,7 @@ import { LinearGradient } from 'expo'
 import { Actions } from 'react-native-router-flux'
 import Modal from 'react-native-modal'
 import { ImagePicker } from 'expo'
-
+import EventEmitter from 'react-native-eventemitter';
 
 
 const window = Dimensions.get('window');
@@ -59,8 +59,15 @@ class ProfileHome extends Component {
               course_id: this.props.selectedCourse
             }
      }
+  }
 
-
+  componentDidMount() {
+    EventEmitter.on('UserHasChanged', (user) => {
+      this.setState( previousState => {
+        previousState.user = user;
+        return previousState;
+      })
+    });
   }
 
   changeModal(state){
