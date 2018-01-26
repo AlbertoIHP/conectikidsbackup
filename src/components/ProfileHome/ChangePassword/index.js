@@ -30,36 +30,58 @@ import { Actions } from 'react-native-router-flux'
 import { userServices } from '../../../services/User.service';
 
 export default class ChangeUser extends Component {
-  constructor( props )
-  {
-    super( props )
-
+  constructor(props) {
+    super(props);
     this.state = {
-      email: this.props.text.user.email,
+      password1: '',
+      password2: '',
+      email: this.props.user.email,
       loading: false,
-      rut: this.props.text.user.rut,
-      name: this.props.text.user.name
-    }
+      rut: this.props.user.rut,
+      name: this.props.user.name,
+      error: ''
+    };
   }
 
   sendData() {
-    this.state.loading =true
-    let newUser = {};
-    newUser.email = this.state.email;
-    newUser.rut = this.state.rut;
-    newUser.name = this.state.name;
-    newUser.picture = this.props.text.user.picture;
-    userServices.updateData(this.props.text.user.id,newUser,this.props.text.token)
-      .then((response) => {
-        this.state.loading = false;
-        this.props.text.reloadTodo(
-          this.props.text.selectedCourse,
-          this.props.text.user,
-          this.props.text.token
-        );
-        Actions.pop();
+    this.setState( previousState => {
+      previousState.error = '';
+      return previousState;
+    })
+
+    if ((this.state.password1 == this.state.password2) && this.state.password1 != '' && this.state.password2 != '' && this.state.password1.length > 6) {
+      this.onLoading();
+      let newUser = {};
+      newUser.email = this.state.email;
+      newUser.rut = this.state.rut;
+      newUser.name = this.state.name;
+      newUser.picture = this.props.user.picture;
+      newUser.password = this.state.password1;
+      userServices.update(this.props.user.id, newUser, this.props.token)
+        .then((response) => {
+          this.onLoading();
+          this.props.onLogOut();
+        })
+        .catch((error) => console.log(error));
+    } else if (this.state.password1.length < 6 && this.state.password1 == this.state.password2 && this.state.password1 != ''){
+      this.setState( previousState => {
+        previousState.error = 'Mínimo 6 caracteres.';
+        return previousState;
       })
-      .catch((error) => console.log(error));
+    }else {
+      this.setState( previousState => {
+        previousState.error = 'Las contraseñas deben coincidir.';
+        return previousState;
+      })
+    }
+
+  }
+
+  onLoading() {
+    this.setState( previousState => {
+      previousState.loading = !this.state.loading;
+      return previousState;
+    })
   }
 
   renderButton()
@@ -82,24 +104,19 @@ export default class ChangeUser extends Component {
     );
   }
 
-  onChangeEmail(email) {
+  onChangePassword1(password1) {
     this.setState( previousState => {
-      previousState.email = email
+      previousState.password1 = password1
       return previousState
     })
   }
-  onChangeRut(rut) {
+  onChangePassword2(password2) {
     this.setState( previousState => {
-      previousState.rut = rut
+      previousState.password2 = password2
       return previousState
     })
   }
-  onChangeName(name) {
-    this.setState( previousState => {
-      previousState.name = name
-      return previousState
-    })
-  }
+
 
   render() {
     return (
@@ -119,7 +136,7 @@ export default class ChangeUser extends Component {
                 </Button>
               </Left>
               <Body>
-                <Title style={{ color: 'white' }}>Cambiar parámetros</Title>
+                <Title style={{ color: 'white' }}>Contraseña</Title>
               </Body>
               <Right />
             </Header>
@@ -128,39 +145,31 @@ export default class ChangeUser extends Component {
             <Form>
               <Item floatingLabel>
                 <Label>
-                  <Icon name='mail' style={{ fontSize: 20, color: 'grey', marginRight: 50 }} />
-                     Prueba@correodeprueba.cl
+                  <Icon name='lock' style={{ fontSize: 20, color: 'grey', marginRight: 50 }} />
+                    Contraseña
                 </Label>
                 <Input
-                  onChangeText={( value ) => this.onChangeEmail(value)}
-                  value={this.state.email}
+                  secureTextEntry
+                  onChangeText={(value) => this.onChangePassword1(value)}
+                  value={this.state.password1}
                 />
               </Item>
               <Item floatingLabel>
                 <Label>
-                  <Icon name='mail' style={{ fontSize: 20, color: 'grey', marginRight: 50 }} />
-                     Nombre
+                  <Icon name='lock' style={{ fontSize: 20, color: 'grey', marginRight: 50 }} />
+                     Repita contraseña
                 </Label>
                 <Input
-                  onChangeText={( value ) => this.onChangeName(value)}
-                  value={this.state.name}
-                />
-              </Item>
-              <Item floatingLabel>
-                <Label>
-                  <Icon name='mail' style={{ fontSize: 20, color: 'grey', marginRight: 50 }} />
-                     RUT
-                </Label>
-                <Input
-                  onChangeText={( value ) => this.onChangeRut(value)}
-                  value={this.state.rut}
+                  secureTextEntry
+                  onChangeText={(value) => this.onChangePassword2(value)}
+                  value={this.state.password2}
                 />
               </Item>
             </Form>
             { this.renderButton() }
             <Body>
               <Text style={styles.errorTextStyle}>
-                {this.props.error2}
+                {this.state.error}
               </Text>
             </Body>
           </Card>
@@ -203,4 +212,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     fontSize: 15
   },
+  errorTextStyle: {
+    fontSize: 15,
+    alignSelf: 'center',
+    color: 'red',
+    marginBottom: 10
+  }
 });

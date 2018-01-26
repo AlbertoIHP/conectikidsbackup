@@ -52,12 +52,98 @@ import { childrenService } from '../../../services/Children.service'
 import { tagService } from '../../../services/Tag.service'
 import Modal from 'react-native-modal'
 
+import base64 from 'base-64'
+
+
+
+// IMAGENES 
 import { ImagePicker } from 'expo'
+
+
+
+
+
 
 
 class AddActivity extends Component {
 
-  //IMAGEN HARDCODEADA DEBE SUBIRSE CORRECTAMENTE
+
+
+  
+  async _pickImage(useCamera)
+  {
+
+    let pickerResult
+
+    if (useCamera) 
+    {
+      pickerResult = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+      });
+    } 
+    else 
+    {
+      pickerResult = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [4, 3],        
+      });
+    }
+
+    if (pickerResult.cancelled)
+    {
+      return;
+    }
+
+    console.log("ESTE ES EL RESULTADO DE LA CAMARA")
+    console.log(pickerResult)
+    this.setState( previousState => {
+      previousState.newActivity.urlPhoto = pickerResult.uri
+      previousState.pickerResult = pickerResult
+
+      return previousState
+    })
+
+      
+
+  }
+
+
+
+  _handleImagePicked = async pickerResult => {
+    let uploadResponse, uploadResult;
+
+    try {
+      this.setState({ uploading: true });
+
+      if (!pickerResult.cancelled) 
+      {
+        uploadResponse = await uploadImageAsync(pickerResult.uri);
+        uploadResult = await uploadResponse.json();
+
+
+      }
+    } catch (e) {
+
+      console.log({ e });
+      alert('Upload failed, sorry :(');
+    } finally {
+
+      if( uploadResult )
+      {
+        console.log("LOGGGG")
+        console.log(uploadResult.location)
+        await this.setState( previousState => {
+          previousState.newActivity.urlPhoto = uploadResult.location
+          
+          return previousState
+        })
+      }      
+      this.setState({ uploading: false });
+    }
+  }
+
+
 
   constructor(props)
   {
@@ -79,14 +165,20 @@ class AddActivity extends Component {
       showedUsers: [],
       toFind: '',
       reload: true,
-      data: []
+      data: [],
+      pickerResult: false
     }
 
     this._publishActivity = this._publishActivity.bind(this);
-    this._explore = this._explore.bind(this);
-    this._openCamera = this._openCamera.bind(this);
     this._tag = this._tag.bind(this)
   }
+
+
+
+
+
+
+
 
 
   componentDidMount()
@@ -109,8 +201,8 @@ class AddActivity extends Component {
 
     this.setState( previousState => {
       previousState.data = [
-      {key: require('./img/photo-camera.png'), func: this._openCamera},
-      {key: require('./img/picture.png'), func: this._explore},
+      {key: require('./img/photo-camera.png'), func: () => this._pickImage(true)},
+      {key: require('./img/picture.png'), func: () => this._pickImage(false) },
       {key: require('./img/Feeling.png')},
       {key: require('./img/user.png'), func:this._tag}
       ]
@@ -118,6 +210,8 @@ class AddActivity extends Component {
       return previousState
     })
   }
+
+
 
 
   changeCoursePeople( coursePeople )
@@ -149,58 +243,15 @@ class AddActivity extends Component {
 
   _tag()
   {
-    console.log("Aqui va la logica para etiquetar")
     this.showTagContent( true )
     this.changeModal( true )
   }
 
-  async _explore()
-  {
-    console.log("Aqui va la logica para abrir el rollo ")
-    let result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [4, 3],
-    });
-
-    console.log(result);
-
-    if (!result.cancelled) 
-    {
-      this.setState( previousState => {
-        previousState.newActivity.urlPhoto = result.uri
-        return previousState
-      });
-    }
-
-  }
-
-
-  async _openCamera()
-  {
-    console.log("Aqui debe ir la logica para abrir la camara (Dependera si es Android o IOS)")
-
-    let result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [4, 3],
-    });
-
-    console.log(result);
-
-    if (!result.cancelled) 
-    {
-      this.setState( previousState => {
-        previousState.newActivity.urlPhoto = result.uri
-        return previousState
-      });
-    }
-
-
-  }
 
 
 
 
-   _publishActivity()
+  async _publishActivity()
   {
 
     if( this.state.newActivity.name === '' || this.state.newActivity.description === '' )
@@ -214,12 +265,13 @@ class AddActivity extends Component {
       this.changeLoading( true )
 
 
-       activityService.store( this.state.newActivity ).then( ( response ) => {
-        console.log( response.data )
-        let activityId = response.data.id
+       await this._handleImagePicked(this.state.pickerResult)
+       console.log("VOY A GUARDAR ESTE ES EL STATE")
+       console.log(this.state.newActivity)
 
-        console.log("MOSTRANDO LAS PERSONAS A GUARDAR COMO ETIQUETADAS EN LA PUBLICACION")
-        console.log("ID DE LA ACTIVIDAD: "+ activityId)
+
+       activityService.store( this.state.newActivity ).then( ( response ) => {
+        let activityId = response.data.id
         for( let tagged of this.state.taggedPeople )
         {
           let newTag = { activity_id: activityId, tagged_id: tagged.id }
@@ -315,12 +367,6 @@ class AddActivity extends Component {
             break
           }
         }
-
-        console.log("STATE.TAGGEDPEOPLE:")
-        console.log(previousState.taggedPeople)
-
-        console.log("STATE.COURSEPEOPLE:")
-        console.log(previousState.coursePeople)
         previousState.showedUsers = previousState.coursePeople
 
         return previousState
@@ -328,8 +374,6 @@ class AddActivity extends Component {
     }
     else
     {
-
-      console.log("AGREGANDO TAG ################################################################################")
 
       await this.setState( previousState => {
         for( let i in previousState.coursePeople )
@@ -341,11 +385,6 @@ class AddActivity extends Component {
             break
           }
         }
-        
-        console.log("STATE.TAGGEDPEOPLE:")
-        console.log(previousState.taggedPeople)
-        console.log("STATE.COURSEPEOPLE:")
-        console.log(previousState.coursePeople)
         previousState.showedUsers = previousState.coursePeople   
 
 
@@ -529,8 +568,7 @@ class AddActivity extends Component {
 
   _renderActivityImage()
   {
-    console.log("DIRECCION DE LA IMAGEN DE LA ACTIVIDAD")
-    console.log( this.state.newActivity.urlPhoto )
+
       return(
         <Row style={{ height: 150 }}>
           <Image source={{ uri: this.state.newActivity.urlPhoto }} style={{ marginTop: 10, resizeMode: 'contain', height: '100%', width: '100%', justifyContent: 'center' }} />      
@@ -744,5 +782,30 @@ const styles = StyleSheet.create({
   }
 })
 
+async function uploadImageAsync(uri) {
+  let apiUrl = 'https://conectikidsback.herokuapp.com/upload';
+
+  let uriParts = uri.split('.');
+  let fileType = uriParts[uriParts.length - 1];
+
+  let formData = new FormData();
+  formData.append('photo', {
+    uri,
+    name: `photo.${fileType}`,
+    type: `image/${fileType}`,
+  });
+
+
+  let options = {
+    method: 'POST',
+    body: formData,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    },
+  };
+
+  return fetch(apiUrl, options);
+}
 
 export default AddActivity;

@@ -31,8 +31,8 @@ class Welcome extends Component {
     super( props )
 
     this.state = {
-      email: 'rara@gmail.com',
-      password: 'cristobal',
+      email: 'a.herrera07@ufromail.cl',
+      password: 'alberto123',
       logeando: ''
     }
 
@@ -87,11 +87,11 @@ class Welcome extends Component {
 
 
 
-  renderButton() 
+  renderButton()
   {
-      if ( this.state.loading ) 
+      if ( this.state.loading )
         return <Spinner color='#fd6342' />;
-      
+
       return (
 
         <TouchableOpacity style={styles.touchable} onPress={() => this.singIn()}>
@@ -104,12 +104,12 @@ class Welcome extends Component {
     );
   }
 
-  render() 
+  render()
   {
     return (
       <Container style={{ flex: 1 }}>
         <Image source={require('./img/BackgroundLogin.png')} resizeMode='cover' style={styles.imageBackground} />
-        
+
         <Content contentContainerStyle={styles.contentStyle} disableKBDismissScroll >
           <Grid>
             <Row size={10} />
@@ -153,7 +153,7 @@ class Welcome extends Component {
                 </Body>
               </Card>
             </Row>
-            
+
             <Row size={15} />
           </Grid>
         </Content>
@@ -210,24 +210,23 @@ const styles = StyleSheet.create({
     color: 'red'
   },
   forgotStyle:
-  { 
-    fontSize: 15, 
-    textDecorationLine: 'underline', 
-    marginTop: 20 
+  {
+    fontSize: 15,
+    textDecorationLine: 'underline',
+    marginTop: 20
   },
   iconInput:
-  { 
-    fontSize: 20, 
-    color: 'grey', 
-    marginRight: 50 
+  {
+    fontSize: 20,
+    color: 'grey',
+    marginRight: 50
   },
   cardStyle:
-  { 
-    marginLeft: 10, 
-    marginRight: 10 
+  {
+    marginLeft: 10,
+    marginRight: 10
   }
 });
 
 
 export default Welcome;
-

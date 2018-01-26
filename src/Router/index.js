@@ -1,4 +1,5 @@
 import React from 'react'
+import { Root } from 'native-base';
 import { Router, Scene } from 'react-native-router-flux'
 import Welcome from '../components/Login/Welcome'
 import ForgotPassword from '../components/Login/ForgotPassword'
@@ -9,10 +10,12 @@ import Comments from '../components/FeedHome/Post/comments'
 import AddChat from '../components/ChatHome/AddChat'
 import Chat from '../components/ChatHome/Chat'
 import ChangeUser from '../components/ProfileHome/ChangeUser'
+import ChangePassword from '../components/ProfileHome/ChangePassword'
 
 
 const RouterComponent = () => {
     return (
+    <Root>
       <Router hideNavBar="true">
         <Scene key="root" hideNavBar="true">
           <Scene key="MainContainer" component={MainContainer} title="MainContainer"/>
@@ -24,8 +27,10 @@ const RouterComponent = () => {
           <Scene key="Comments" component={Comments} title="Comments" />
           <Scene key="AddChat" component={AddChat} title="AddChat" />
           <Scene key="Chat" component={Chat} title="Chat" />
+          <Scene key="ChangePassword" component={ChangePassword} title="ChangePassword" />
         </Scene>
       </Router>
+    </Root>
     );
   };
 

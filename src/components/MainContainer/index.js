@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   Image,
   Platform,
-  Dimensions
+  Dimensions,
+  Alert
 } from 'react-native'
 
 import {
@@ -78,7 +79,8 @@ export default class MainContainer extends Component {
       user: {},
       token: '',
       datas: [],
-      selectedCourse: ''
+      selectedCourse: '',
+      dataForReset: []
     }
   }
 
@@ -102,17 +104,16 @@ export default class MainContainer extends Component {
           //RESPECTIVAMENTE, SIEMPRE DEPENDIENDO DE LA ID, ENTONCES, CUANDO SE CAMBIE DE ID, SE EMITIRA
           //NUEVAMENTE ESTE EVENTO, DE MANERA QUE, TODO SU CONETENIDO, SERA RECARGADO
 
-          this.changeCourseId( previousState.datas[0].id, previousState.token )        
-        
+          this.changeCourseId( previousState.datas[0].id, previousState.token )
+
           return previousState
-        })      
+        })
       } ).catch( ( error ) => {
         console.log( error )
-      })      
+      })
     }
     else if( user.role === 'parent')
     {
-      console.log("AQUI SE DEBE DE CREAR UN ENDPOINT PARA FILTRAR POR LOS NIÑOS DE UN PADRE")
 
       childrenService.getChildrensByUserId( user.id, token ).then( ( response ) => {
         this.setState( (previousState) => {
@@ -126,19 +127,17 @@ export default class MainContainer extends Component {
           //RESPECTIVAMENTE, SIEMPRE DEPENDIENDO DE LA ID, ENTONCES, CUANDO SE CAMBIE DE ID, SE EMITIRA
           //NUEVAMENTE ESTE EVENTO, DE MANERA QUE, TODO SU CONETENIDO, SERA RECARGADO
 
-          console.log( response.data )
-          
-          this.changeCourseId( previousState.datas[0].course_id, previousState.token )        
-        
+          this.changeCourseId( previousState.datas[0].course_id, previousState.token )
+
           return previousState
-        })   
+        })
       })
 
 
 
     }
 
-    
+
 
 
 
@@ -232,7 +231,7 @@ export default class MainContainer extends Component {
   {
     return (
       <Right>
-        <Button transparent onPress={() => Actions.ChangeUser({text: {user: this.state.user, token: this.state.token, selectedCourse: this.state.selectedCourse } }) }>
+        <Button transparent onPress={() => Actions.ChangeUser({text: {user: this.state.user, token: this.state.token, selectedCourse: this.state.selectedCourse, reloadTodo: this.reloadTodo } }) }>
           <Icon style= {{ color: "white" }} name="settings" />
         </Button>
       </Right>
@@ -247,7 +246,7 @@ export default class MainContainer extends Component {
           <Icon style= {{ color: "white" }} name="ios-add-outline" />
         </Button>
       </Right>
-      )    
+      )
   }
 
   changeSelectedCourse( courseId )
@@ -268,6 +267,7 @@ export default class MainContainer extends Component {
 
   realoadAll( data )
   {
+
     if( this.state.user.role === 'teacher' )
     {
       this.changeCourseId( data.id, this.state.token )
@@ -278,6 +278,20 @@ export default class MainContainer extends Component {
     }
 
 
+  }
+
+  reloadTodo( idCourse, user, token)
+  {
+    console.log('crear todo la logica para recargar');
+  }
+
+  async onLogOut() {
+    let token =  await storage.removeItem( 'token' )
+    .then((response) => {
+      Alert.alert('Cerrar Sesión', 'Se deslogeará tu cuenta.');
+      Actions.Welcome({type: 'reset'});
+    })
+    .catch((error) => console.log(error));
   }
 
 
@@ -292,13 +306,17 @@ export default class MainContainer extends Component {
               <Image style={ styles.logoNameStyle } source={ drawerImage } />
             </Row>
             <Row>
-              { this.state.user.role === 'teacher' ? <Text> Mis Cursos </Text> : <Text> Mis Hijos </Text>}            
-              
+            <List>
+              <ListItem itemHeader first>
+              { this.state.user.role === 'teacher' ? <Text style={{ fontSize: 20 }}>Mis Cursos</Text> : <Text style={{ fontSize: 20 }} >Mis Hijos</Text>}
+              </ListItem>
+            </List>
+
             </Row>
 
             <Row>
               <List dataArray={ this.state.datas } renderRow={data =>
-                <ListItem button noBorder onPress={() => this.realoadAll( data ) }>
+                <ListItem button noBorder onPress={() => this.realoadAll( data )}>
                     <Left>
                       <Icon active name={"ios-people-outline"} style={ styles.IconStyle } />
                       <Text style={styles.text}>
@@ -307,9 +325,37 @@ export default class MainContainer extends Component {
                     </Left>
                 </ListItem>}/>
             </Row>
+            <Row>
+              <List style={{ flex: 1 }}>
+                <ListItem itemHeader first>
+                  <Text style={{ fontSize: 20 }}>Herramientas</Text>
+                </ListItem>
+                <ListItem noBorder onPress={() => Actions.ChangePassword({ onLogOut: this.onLogOut, user: this.state.user, token: this.state.token })}>
+                <Left>
+                  <Icon active name='settings' style={ styles.IconStyle } />
+                  <Text style={styles.text}>
+                    Cambiar contraseña
+                  </Text>
+                </Left>
+                </ListItem>
+              </List>
+            </Row>
 
           </Grid>
         </Content>
+        <Footer style={{ backgroundColor: 'white', flexDirection: 'column' }}>
+          <ListItem noBorder style={{ flex: 1, height: '100%' }} onPress={() => this.onLogOut()}>
+            <Icon active android="md-log-out" ios="ios-log-out" style={{
+                color: "#fd6b71",
+                fontSize: 26,
+                width: 30,
+                marginLeft: 10
+            }}/>
+            <Text style={styles.text}>
+              Cerrar sesión
+            </Text>
+          </ListItem>
+        </Footer>
       </Container>
       )
   }
@@ -362,7 +408,7 @@ export default class MainContainer extends Component {
   }
 
 
-  render() 
+  render()
   {
 
 
@@ -397,7 +443,7 @@ export default class MainContainer extends Component {
 
 
                 { this._renderRightSide() }
-                               
+
 
               </Header>
             </LinearGradient>
