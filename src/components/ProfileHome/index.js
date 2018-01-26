@@ -34,7 +34,7 @@ import { LinearGradient } from 'expo'
 import { Actions } from 'react-native-router-flux'
 import Modal from 'react-native-modal'
 import { ImagePicker } from 'expo'
-
+import { userServices } from '../../services/User.service';
 
 
 const window = Dimensions.get('window');
@@ -45,6 +45,93 @@ var CANCEL_INDEX = 4;
 
 
 class ProfileHome extends Component {
+
+
+
+
+  async _pickImage(useCamera)
+  {
+
+    let pickerResult
+
+    if (useCamera) 
+    {
+      pickerResult = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+      });
+    } 
+    else 
+    {
+      pickerResult = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [4, 3],        
+      });
+    }
+
+    if (pickerResult.cancelled)
+    {
+      return;
+    }
+
+    console.log("ESTE ES EL RESULTADO DE LA CAMARA")
+    console.log(pickerResult)
+    this.setState( previousState => {
+      previousState.user.picture = pickerResult.uri
+      previousState.pickerResult = pickerResult
+      this._handleImagePicked(previousState.pickerResult)
+      return previousState
+    })
+
+
+      
+
+  }
+
+  _handleImagePicked = async pickerResult => {
+    let uploadResponse, uploadResult;
+
+    try {
+
+      if (!pickerResult.cancelled) 
+      {
+        uploadResponse = await uploadImageAsync(pickerResult.uri);
+        uploadResult = await uploadResponse.json();
+
+
+      }
+    } catch (e) {
+
+      console.log({ e });
+      alert('Upload failed, sorry :(');
+    } finally {
+
+      if( uploadResult )
+      {
+        console.log("LOGGGG")
+        console.log(uploadResult.location)
+        await this.setState( previousState => {
+          previousState.user.picture = uploadResult.location
+
+
+          let newUser = {};
+          newUser.email = previousState.user.email;
+          newUser.rut = previousState.user.rut;
+          newUser.name = previousState.user.name;
+          newUser.picture = previousState.user.picture;
+          userServices.updateData( previousState.user.id, newUser, this.props.token)
+            .then((response) => {
+              previousState.user = response.data
+              Actions.pop();
+            })
+            .catch((error) => console.log(error));
+          
+          return previousState
+        })
+      }      
+    }
+  }
+
 
   constructor( props )
   {
@@ -57,7 +144,8 @@ class ProfileHome extends Component {
       text: '',
       data: { id: this.props.selectedCourse,
               course_id: this.props.selectedCourse
-            }
+            },
+      pickerResult: false
      }
 
 
@@ -75,54 +163,6 @@ class ProfileHome extends Component {
       previousState.text = text
       return previousState
     })
-  }
-
-  _onButtonPress() {
-
-  }
-
-
-  async _explore()
-  {
-    console.log("Aqui va la logica para abrir el rollo ")
-    let result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [4, 3],
-    });
-
-    console.log(result);
-
-    if (!result.cancelled)
-    {
-      this.setState( previousState => {
-        previousState.newActivity.urlPhoto = result.uri
-        return previousState
-      });
-    }
-
-  }
-
-
-  async _openCamera()
-  {
-    console.log("Aqui debe ir la logica para abrir la camara (Dependera si es Android o IOS)")
-
-    let result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [4, 3],
-    });
-
-    console.log(result);
-
-    if (!result.cancelled)
-    {
-      this.setState( previousState => {
-        previousState.newActivity.urlPhoto = result.uri
-        return previousState
-      });
-    }
-
-
   }
 
   onSuccess() {
@@ -153,9 +193,9 @@ class ProfileHome extends Component {
               },
               buttonIndex => {
                 if (buttonIndex == 0) {
-                  this._openCamera();
+                  this._pickImage(true);
                 }else if (buttonIndex == 1) {
-                  this._explore();
+                  this._pickImage(false);
                 }else {
                   console.log('cancelled');
                 }
@@ -206,6 +246,54 @@ class ProfileHome extends Component {
     );
   }
 }
+
+
+
+async function uploadImageAsync(uri) {
+  let apiUrl = 'https://conectikidsback.herokuapp.com/upload';
+
+  let uriParts = uri.split('.');
+  let fileType = uriParts[uriParts.length - 1];
+
+  let formData = new FormData();
+  formData.append('photo', {
+    uri,
+    name: `photo.${fileType}`,
+    type: `image/${fileType}`,
+  });
+
+
+  let options = {
+    method: 'POST',
+    body: formData,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    },
+  };
+
+  return fetch(apiUrl, options);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const styles = StyleSheet.create({
   listItem: {
