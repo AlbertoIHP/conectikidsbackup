@@ -34,7 +34,6 @@ export default class ChangeUser extends Component {
   {
     super( props )
 
-
     this.state = {
       email: this.props.text.user.email,
       loading: false,
@@ -52,8 +51,13 @@ export default class ChangeUser extends Component {
     newUser.picture = this.props.text.user.picture;
     userServices.updateData(this.props.text.user.id,newUser,this.props.text.token)
       .then((response) => {
-        this.state.loading = false
-        Actions.pop()
+        this.state.loading = false;
+        this.props.text.reloadTodo(
+          this.props.text.selectedCourse,
+          this.props.text.user,
+          this.props.text.token
+        );
+        Actions.pop();
       })
       .catch((error) => console.log(error));
   }
