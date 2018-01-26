@@ -35,6 +35,7 @@ import { Actions } from 'react-native-router-flux'
 import Modal from 'react-native-modal'
 import { ImagePicker } from 'expo'
 import { userServices } from '../../services/User.service';
+import EventEmitter from 'react-native-eventemitter';
 
 
 const window = Dimensions.get('window');
@@ -147,8 +148,15 @@ class ProfileHome extends Component {
             },
       pickerResult: false
      }
+  }
 
-
+  componentDidMount() {
+    EventEmitter.on('UserHasChanged', (user) => {
+      this.setState( previousState => {
+        previousState.user = user;
+        return previousState;
+      })
+    });
   }
 
   changeModal(state){
